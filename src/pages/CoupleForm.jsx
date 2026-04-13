@@ -6,135 +6,291 @@ import { doc, setDoc } from "firebase/firestore";
 export default function CoupleForm() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     firstName: "", lastName: "", dob: "",
     address: "", city: "", state: "", zip: "",
-    weddingDate: "", weddingCity: "", weddingZip: "",
-    budget: "", venueFinalized: ""
+    weddingDate: "", weddingCityDecided: "",
+    weddingCity: "", weddingZip: "", budget: ""
   });
-  const [loading, setLoading] = useState(false);
 
   const update = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const inputStyle = {
-    padding: "13px 16px", border: "1.5px solid #e0d5c0",
-    borderRadius: 12, fontSize: 15, outline: "none",
-    background: "#fafafa", width: "100%", fontFamily: "Inter, sans-serif"
+    width: "100%", padding: "14px 16px",
+    border: "1.5px solid rgba(231,114,145,0.25)",
+    borderRadius: 14, fontSize: 15, outline: "none",
+    background: "rgba(255,255,255,0.06)",
+    color: "#FFFFFF", fontFamily: "'DM Sans', sans-serif",
+    boxSizing: "border-box"
   };
 
-  const labelStyle = { fontSize: 12, color: "#800020", fontWeight: 600, marginBottom: 4, display: "block", letterSpacing: 0.5 };
+  const labelStyle = {
+    fontSize: 11, color: "#E77291", fontWeight: 600,
+    letterSpacing: 1.5, marginBottom: 6, display: "block"
+  };
 
   const submit = async () => {
-    setLoading(true);
-    try {
-      await setDoc(doc(db, "couples", auth.currentUser.uid), {
-        ...form, uid: auth.currentUser.uid, createdAt: new Date()
-      });
+  setLoading(true);
+  try {
+    // If no Firebase auth user, just navigate directly (demo mode)
+    if (!auth.currentUser) {
       navigate("/home");
-    } catch (e) { alert(e.message); }
-    setLoading(false);
-  };
+      return;
+    }
+    await setDoc(doc(db, "couples", auth.currentUser.uid), {
+      ...form, uid: auth.currentUser.uid, createdAt: new Date()
+    });
+    navigate("/home");
+  } catch (e) { alert(e.message); }
+  setLoading(false);
+};
 
   return (
-    <div style={{ minHeight: "100vh", background: "#FFFFF0", padding: "24px 16px" }}>
-      <div style={{ maxWidth: 480, margin: "0 auto" }}>
-        <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <h1 style={{ fontFamily: "Georgia, serif", fontSize: 28, color: "#800020" }}>Tell us about you 💍</h1>
-          <p style={{ color: "#6b6b6b", fontSize: 14, marginTop: 6 }}>Step {step} of 2</p>
-          <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 12 }}>
-            {[1,2].map(i => (
-              <div key={i} style={{ height: 4, width: 60, borderRadius: 99, background: i <= step ? "#800020" : "#e0d5c0" }}/>
-            ))}
+    <div style={{
+      minHeight: "100vh",
+      background: "linear-gradient(180deg, #3E0014 0%, #1a0008 100%)",
+      fontFamily: "'DM Sans', sans-serif",
+      display: "flex", flexDirection: "column",
+      overflowY: "auto"
+    }}>
+
+      {/* Header */}
+      <div style={{ padding: "48px 24px 24px", textAlign: "center" }}>
+        <p style={{
+          color: "#E77291", fontSize: 11,
+          letterSpacing: 4, fontWeight: 600, marginBottom: 8
+        }}>STEP {step} OF 2</p>
+        <h1 style={{
+          fontFamily: "'DM Serif Display', serif",
+          fontStyle: "italic", color: "#FFFFFF",
+          fontSize: 30, marginBottom: 8
+        }}>
+          {step === 1 ? "Tell us about you" : "Your Wedding Details"}
+        </h1>
+        <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 14 }}>
+          {step === 1
+            ? "We'll personalise your experience"
+            : "Help us understand your big day"}
+        </p>
+
+        {/* Progress bar */}
+        <div style={{
+          display: "flex", gap: 8, marginTop: 24,
+          justifyContent: "center"
+        }}>
+          {[1, 2].map(i => (
+            <div key={i} style={{
+              height: 4, borderRadius: 99,
+              width: i === step ? 48 : 24,
+              background: i <= step
+                ? "linear-gradient(90deg, #E77291, #AC1634)"
+                : "rgba(255,255,255,0.15)",
+              transition: "all 0.3s ease"
+            }} />
+          ))}
+        </div>
+      </div>
+
+      {/* Form Card */}
+      <div style={{
+        flex: 1, margin: "0 16px 32px",
+        background: "rgba(255,255,255,0.05)",
+        border: "1px solid rgba(231,114,145,0.15)",
+        borderRadius: 28, padding: "28px 20px",
+        backdropFilter: "blur(10px)",
+        overflowY: "auto"
+      }}>
+
+        {/* ── STEP 1 — Personal Details ── */}
+        {step === 1 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div>
+                <label style={labelStyle}>FIRST NAME</label>
+                <input style={inputStyle} placeholder="Priya"
+                  value={form.firstName}
+                  onChange={e => update("firstName", e.target.value)} />
+              </div>
+              <div>
+                <label style={labelStyle}>LAST NAME</label>
+                <input style={inputStyle} placeholder="Sharma"
+                  value={form.lastName}
+                  onChange={e => update("lastName", e.target.value)} />
+              </div>
+            </div>
+
+            <div>
+              <label style={labelStyle}>DATE OF BIRTH</label>
+              <input
+                style={{ ...inputStyle, colorScheme: "dark" }}
+                type="date" value={form.dob}
+                onChange={e => update("dob", e.target.value)} />
+            </div>
+
+            <div>
+              <label style={labelStyle}>ADDRESS</label>
+              <input style={inputStyle} placeholder="123, MG Road"
+                value={form.address}
+                onChange={e => update("address", e.target.value)} />
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div>
+                <label style={labelStyle}>CITY</label>
+                <input style={inputStyle} placeholder="Delhi"
+                  value={form.city}
+                  onChange={e => update("city", e.target.value)} />
+              </div>
+              <div>
+                <label style={labelStyle}>STATE</label>
+                <input style={inputStyle} placeholder="Delhi"
+                  value={form.state}
+                  onChange={e => update("state", e.target.value)} />
+              </div>
+            </div>
+
+            <div>
+              <label style={labelStyle}>ZIP CODE</label>
+              <input style={inputStyle} placeholder="110001"
+                value={form.zip}
+                onChange={e => update("zip", e.target.value)} />
+            </div>
+
+            <button onClick={() => setStep(2)} style={{
+              marginTop: 8, padding: "16px",
+              background: "linear-gradient(135deg, #AC1634, #3E0014)",
+              color: "white", border: "none", borderRadius: 999,
+              fontSize: 15, fontWeight: 600, cursor: "pointer",
+              boxShadow: "0 8px 24px rgba(172,22,52,0.35)",
+              fontFamily: "'DM Sans', sans-serif"
+            }}>Continue →</button>
           </div>
-        </div>
+        )}
 
-        <div style={{ background: "white", borderRadius: 24, padding: "28px 24px", boxShadow: "0 4px 24px rgba(0,0,0,0.08)" }}>
-          {step === 1 && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                <div>
-                  <label style={labelStyle}>FIRST NAME</label>
-                  <input style={inputStyle} placeholder="Priya" value={form.firstName} onChange={e => update("firstName", e.target.value)} />
-                </div>
-                <div>
-                  <label style={labelStyle}>LAST NAME</label>
-                  <input style={inputStyle} placeholder="Sharma" value={form.lastName} onChange={e => update("lastName", e.target.value)} />
-                </div>
-              </div>
-              <div>
-                <label style={labelStyle}>DATE OF BIRTH</label>
-                <input style={inputStyle} type="date" value={form.dob} onChange={e => update("dob", e.target.value)} />
-              </div>
-              <div>
-                <label style={labelStyle}>ADDRESS</label>
-                <input style={inputStyle} placeholder="123, MG Road" value={form.address} onChange={e => update("address", e.target.value)} />
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                <div>
-                  <label style={labelStyle}>CITY</label>
-                  <input style={inputStyle} placeholder="Delhi" value={form.city} onChange={e => update("city", e.target.value)} />
-                </div>
-                <div>
-                  <label style={labelStyle}>STATE</label>
-                  <input style={inputStyle} placeholder="Delhi" value={form.state} onChange={e => update("state", e.target.value)} />
-                </div>
-              </div>
-              <button onClick={() => setStep(2)} style={{
-                padding: "14px", background: "#800020", color: "white",
-                border: "none", borderRadius: 999, fontSize: 15,
-                fontWeight: 700, cursor: "pointer", marginTop: 8
-              }}>Next →</button>
+        {/* ── STEP 2 — Wedding Details ── */}
+        {step === 2 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+
+            <div>
+              <label style={labelStyle}>DATE OF MARRIAGE</label>
+              <input
+                style={{ ...inputStyle, colorScheme: "dark" }}
+                type="date" value={form.weddingDate}
+                onChange={e => update("weddingDate", e.target.value)} />
             </div>
-          )}
 
-          {step === 2 && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <div>
-                <label style={labelStyle}>WEDDING DATE</label>
-                <input style={inputStyle} type="date" value={form.weddingDate} onChange={e => update("weddingDate", e.target.value)} />
-              </div>
-              <div>
-                <label style={labelStyle}>WEDDING CITY</label>
-                <input style={inputStyle} placeholder="Jaipur" value={form.weddingCity} onChange={e => update("weddingCity", e.target.value)} />
-              </div>
-              <div>
-                <label style={labelStyle}>BUDGET</label>
-                <select style={inputStyle} value={form.budget} onChange={e => update("budget", e.target.value)}>
-                  <option value="">Select budget range</option>
-                  <option>₹10L – ₹15L</option>
-                  <option>₹15L – ₹20L</option>
-                  <option>₹20L – ₹25L</option>
-                  <option>₹25L – ₹30L</option>
-                  <option>₹30L+</option>
-                </select>
-              </div>
-              <div>
-                <label style={labelStyle}>VENUE FINALIZED?</label>
-                <div style={{ display: "flex", gap: 10 }}>
-                  {["Yes", "No", "In Discussion"].map(v => (
-                    <button key={v} onClick={() => update("venueFinalized", v)} style={{
-                      flex: 1, padding: "10px", border: `2px solid ${form.venueFinalized === v ? "#800020" : "#e0d5c0"}`,
-                      borderRadius: 12, background: form.venueFinalized === v ? "#800020" : "white",
-                      color: form.venueFinalized === v ? "white" : "#6b6b6b",
-                      fontWeight: 600, fontSize: 13, cursor: "pointer"
+            {/* Wedding city decision */}
+            <div>
+              <label style={labelStyle}>IS THE WEDDING CITY DECIDED?</label>
+              <div style={{ display: "flex", gap: 10 }}>
+                {["Yes", "No"].map(v => (
+                  <button key={v}
+                    onClick={() => update("weddingCityDecided", v)}
+                    style={{
+                      flex: 1, padding: "13px",
+                      border: `1.5px solid ${form.weddingCityDecided === v
+                        ? "#E77291" : "rgba(231,114,145,0.2)"}`,
+                      borderRadius: 14,
+                      background: form.weddingCityDecided === v
+                        ? "rgba(231,114,145,0.15)" : "transparent",
+                      color: form.weddingCityDecided === v
+                        ? "#E77291" : "rgba(255,255,255,0.5)",
+                      fontWeight: 600, fontSize: 14,
+                      cursor: "pointer", transition: "all 0.2s",
+                      fontFamily: "'DM Sans', sans-serif"
                     }}>{v}</button>
-                  ))}
-                </div>
-              </div>
-              <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
-                <button onClick={() => setStep(1)} style={{
-                  flex: 1, padding: "14px", background: "#f5f0dc", color: "#800020",
-                  border: "none", borderRadius: 999, fontSize: 15, fontWeight: 700, cursor: "pointer"
-                }}>← Back</button>
-                <button onClick={submit} disabled={loading} style={{
-                  flex: 2, padding: "14px", background: loading ? "#ccc" : "#800020",
-                  color: "white", border: "none", borderRadius: 999,
-                  fontSize: 15, fontWeight: 700, cursor: "pointer"
-                }}>{loading ? "Saving..." : "Let's Plan! 💍"}</button>
+                ))}
               </div>
             </div>
-          )}
-        </div>
+
+            {/* Conditional city fields */}
+            {form.weddingCityDecided === "Yes" && (
+              <div style={{
+                display: "flex", flexDirection: "column", gap: 14,
+                padding: "16px",
+                background: "rgba(231,114,145,0.06)",
+                border: "1px solid rgba(231,114,145,0.15)",
+                borderRadius: 16
+              }}>
+                <div>
+                  <label style={labelStyle}>WEDDING CITY</label>
+                  <input style={inputStyle} placeholder="Jaipur"
+                    value={form.weddingCity}
+                    onChange={e => update("weddingCity", e.target.value)} />
+                </div>
+                <div>
+                  <label style={labelStyle}>WEDDING CITY ZIP CODE</label>
+                  <input style={inputStyle} placeholder="302001"
+                    value={form.weddingZip}
+                    onChange={e => update("weddingZip", e.target.value)} />
+                </div>
+              </div>
+            )}
+
+            {/* Budget */}
+            <div>
+              <label style={labelStyle}>WEDDING BUDGET</label>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {["₹10L – ₹15L", "₹15L – ₹20L", "₹20L – ₹25L", "₹25L – ₹30L", "₹30L+"].map(b => (
+                  <button key={b}
+                    onClick={() => update("budget", b)}
+                    style={{
+                      padding: "13px 16px", textAlign: "left",
+                      border: `1.5px solid ${form.budget === b
+                        ? "#E77291" : "rgba(231,114,145,0.2)"}`,
+                      borderRadius: 14,
+                      background: form.budget === b
+                        ? "rgba(231,114,145,0.12)" : "transparent",
+                      color: form.budget === b
+                        ? "#FFFFFF" : "rgba(255,255,255,0.4)",
+                      fontWeight: form.budget === b ? 600 : 400,
+                      fontSize: 14, cursor: "pointer",
+                      transition: "all 0.2s",
+                      fontFamily: "'DM Sans', sans-serif",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center"
+                    }}>
+                    {b}
+                    {form.budget === b && (
+                      <span style={{ color: "#E77291" }}>✓</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Navigation buttons */}
+            <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+              <button onClick={() => setStep(1)} style={{
+                flex: 1, padding: "16px",
+                background: "rgba(255,255,255,0.08)",
+                color: "rgba(255,255,255,0.7)",
+                border: "1px solid rgba(255,255,255,0.15)",
+                borderRadius: 999, fontSize: 15,
+                fontWeight: 600, cursor: "pointer",
+                fontFamily: "'DM Sans', sans-serif"
+              }}>← Back</button>
+
+              <button onClick={submit} disabled={loading} style={{
+                flex: 2, padding: "16px",
+                background: loading
+                  ? "rgba(172,22,52,0.4)"
+                  : "linear-gradient(135deg, #AC1634, #3E0014)",
+                color: "white", border: "none", borderRadius: 999,
+                fontSize: 15, fontWeight: 600,
+                cursor: loading ? "not-allowed" : "pointer",
+                fontFamily: "'DM Sans', sans-serif",
+                boxShadow: loading ? "none" : "0 8px 24px rgba(172,22,52,0.35)"
+              }}>
+                {loading ? "Saving..." : "Let's Plan! 💍"}
+              </button>
+            </div>
+
+          </div>
+        )}
       </div>
     </div>
   );

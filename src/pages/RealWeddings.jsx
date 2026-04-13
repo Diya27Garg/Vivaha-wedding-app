@@ -1,147 +1,276 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 const weddings = [
-  { id: 1, couple: "Riya & Arjun", city: "Udaipur", type: "Destination", guests: 250, budget: "₹25L–30L", story: "A royal lakeside wedding with a breathtaking sunset ceremony at Lake Pichola.", highlights: ["Lake venue", "Royal theme", "500 floral arrangements"], vendors: { photographer: "Lens & Love Studio", decorator: "Royal Blooms", makeup: "Glam by Priya", venue: "Taj Lake Palace" }, emoji: "🏰" },
-  { id: 2, couple: "Meera & Karan", city: "Goa", type: "Beach", guests: 120, budget: "₹15L–20L", story: "An intimate barefoot beach wedding at sunset with bohemian florals and fairy lights.", highlights: ["Beach ceremony", "Boho decor", "Live music"], vendors: { photographer: "Golden Hour Films", decorator: "Bloom & Breeze", makeup: "Coastal Glow", venue: "W Goa" }, emoji: "🌊" },
-  { id: 3, couple: "Ananya & Rohan", city: "Jaipur", type: "Traditional", guests: 500, budget: "₹20L–25L", story: "A grand Rajasthani wedding with elephant processions and traditional folk performances.", highlights: ["Elephant entry", "Folk dance", "Royal cuisine"], vendors: { photographer: "Heritage Clicks", decorator: "Marigold Magic", makeup: "Rajwadi Beauty", venue: "Jai Mahal Palace" }, emoji: "🐘" },
-  { id: 4, couple: "Priya & Vikram", city: "Mumbai", type: "Intimate", guests: 80, budget: "₹10L–15L", story: "A chic rooftop wedding overlooking the city skyline with minimalist luxury decor.", highlights: ["City skyline", "Minimalist decor", "Gourmet catering"], vendors: { photographer: "City Frames", decorator: "Pure White Decor", makeup: "Studio Luxe", venue: "The Taj Mahal Hotel" }, emoji: "🌆" },
+  {
+    id: 1,
+    couple: "Riya & Arjun",
+    date: "December 2024",
+    city: "Udaipur",
+    type: "Destination",
+    image: "https://images.unsplash.com/photo-1519741497674-611481863552?w=600&q=80",
+    story: "Riya and Arjun planned their dream lakeside wedding in just 3 months using Vivaha. From finding their royal palace venue to booking a Power Pair of photographer and decorator — everything was coordinated in one place. Vivaha's AI assistant even reminded them of every milestone on time.",
+  },
+  {
+    id: 2,
+    couple: "Meera & Karan",
+    date: "February 2025",
+    city: "Goa",
+    type: "Beach Wedding",
+    image: "https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=600&q=80",
+    story: "Meera and Karan wanted an intimate beach wedding but had no idea where to start. Vivaha's Build Package feature helped them assemble the perfect vendor team — a boho decorator, sunset photographer, and live music duo — all within their ₹15L budget.",
+  },
+  {
+    id: 3,
+    couple: "Ananya & Rohan",
+    date: "November 2024",
+    city: "Jaipur",
+    type: "Royal Traditional",
+    image: "https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=600&q=80",
+    story: "With 500 guests and a royal Rajasthani theme, Ananya and Rohan needed serious coordination. Vivaha's checklist kept 47 tasks on track, and the inspiration board helped them nail the marigold-and-gold aesthetic. Their vendor team was booked through Power Pairs in a single afternoon.",
+  },
+  {
+    id: 4,
+    couple: "Priya & Vikram",
+    date: "January 2025",
+    city: "Mumbai",
+    type: "Rooftop Intimate",
+    image: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&q=80",
+    story: "Priya and Vikram chose a minimalist rooftop wedding for 80 guests. They used Vivaha to shortlist vendors, track their ₹12L budget, and coordinate with their fiancé in real time through the couple collaboration feature. The whole planning process took just 6 weeks.",
+  },
+  {
+    id: 5,
+    couple: "Simran & Aditya",
+    date: "March 2025",
+    city: "Delhi",
+    type: "Garden Wedding",
+    image: "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=600&q=80",
+    story: "Simran and Aditya discovered their dream florist and makeup artist through Vivaha's Top Vendors section. The inspiration board helped them visualize their garden wedding aesthetic months before the event, and the AI assistant created a perfect 6-month timeline for them.",
+  },
 ];
 
 export default function RealWeddings() {
-  const [selected, setSelected] = useState(null);
   const navigate = useNavigate();
+  const [current, setCurrent] = useState(0);
+  const [hoveredCouple, setHoveredCouple] = useState(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const intervalRef = useRef(null);
+
+  const goTo = (index) => {
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrent(index);
+      setIsTransitioning(false);
+    }, 300);
+  };
+
+  const next = () => goTo((current + 1) % weddings.length);
+  const prev = () => goTo((current - 1 + weddings.length) % weddings.length);
+
+  useEffect(() => {
+    intervalRef.current = setInterval(next, 4000);
+    return () => clearInterval(intervalRef.current);
+  }, [current]);
+
+  const pauseAutoplay = () => clearInterval(intervalRef.current);
+  const resumeAutoplay = () => {
+    intervalRef.current = setInterval(next, 4000);
+  };
+
+  const w = weddings[current];
 
   return (
-    <div style={{ minHeight: "100vh", background: "#FFFFF0", padding: "0 0 40px" }}>
-      <div style={{
-        background: "linear-gradient(135deg, #800020, #5a0015)",
-        padding: "48px 24px 32px",
-        textAlign: "center"
-      }}>
-        <p style={{ color: "#C9A84C", fontSize: 13, letterSpacing: 3, marginBottom: 8 }}>REAL WEDDINGS BY</p>
-        <h1 style={{ fontFamily: "Georgia, serif", fontSize: 36, color: "white", marginBottom: 8 }}>Vivaha</h1>
-        <p style={{ color: "#e2c97e", fontSize: 14, opacity: 0.9 }}>See how couples planned their dream weddings with us</p>
+    <div style={{
+      display: "flex", flexDirection: "column", minHeight: "100vh",
+      background: "#3B010B", fontFamily: "'DM Sans', sans-serif"
+    }}>
+
+      {/* Header */}
+      <div style={{ padding: "32px 24px 16px", textAlign: "center" }}>
+        <p style={{
+          color: "#E77291", fontSize: 11, letterSpacing: 4,
+          fontWeight: 600, marginBottom: 8
+        }}>REAL WEDDINGS BY</p>
+        <h1 style={{
+          fontFamily: "'DM Serif Display', serif",
+          fontStyle: "italic", color: "#FFFFFF",
+          fontSize: 36, letterSpacing: 1
+        }}>Vivaha</h1>
+        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, marginTop: 6 }}>
+          Real couples. Real stories. Real magic.
+        </p>
       </div>
 
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(2, 1fr)",
-        gap: 16,
-        padding: "24px 16px",
-        maxWidth: 600,
-        margin: "0 auto"
-      }}>
-        {weddings.map(w => (
-          <div key={w.id} onClick={() => setSelected(w)} style={{
-            background: "white",
-            borderRadius: 20,
-            overflow: "hidden",
-            boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
-            cursor: "pointer",
-            transition: "transform 0.2s",
+      {/* Main Carousel */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "16px" }}>
+
+        {/* Image Card */}
+        <div
+          onMouseEnter={pauseAutoplay}
+          onMouseLeave={resumeAutoplay}
+          style={{
+            position: "relative", borderRadius: 28, overflow: "hidden",
+            flex: 1, minHeight: 380,
+            opacity: isTransitioning ? 0 : 1,
+            transform: isTransitioning ? "scale(0.97)" : "scale(1)",
+            transition: "opacity 0.3s ease, transform 0.3s ease",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.5)"
           }}
-          onMouseEnter={e => e.currentTarget.style.transform = "translateY(-4px)"}
-          onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
-          >
-            <div style={{
-              height: 100,
-              background: "linear-gradient(135deg, #800020, #C9A84C)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 40
-            }}>{w.emoji}</div>
-            <div style={{ padding: "12px" }}>
-              <p style={{ fontWeight: 700, color: "#800020", fontSize: 14, fontFamily: "Georgia, serif" }}>{w.couple}</p>
-              <p style={{ color: "#6b6b6b", fontSize: 12, marginTop: 2 }}>{w.city} · {w.type}</p>
-            </div>
-          </div>
-        ))}
-      </div>
+        >
+          {/* Background Image */}
+          <img
+            src={w.image}
+            alt={w.couple}
+            style={{
+              width: "100%", height: "100%",
+              objectFit: "cover", position: "absolute", inset: 0
+            }}
+          />
 
-      <div style={{ textAlign: "center", padding: "0 24px" }}>
-        <button onClick={() => navigate("/role")} style={{
-          background: "#800020",
-          color: "white",
-          border: "none",
-          borderRadius: 999,
-          padding: "14px 40px",
-          fontSize: 15,
-          fontWeight: 600,
-          cursor: "pointer"
-        }}>Start Planning Your Wedding →</button>
-      </div>
+          {/* Gradient Overlay */}
+          <div style={{
+            position: "absolute", inset: 0,
+            background: "linear-gradient(to top, rgba(59,1,11,0.95) 0%, rgba(59,1,11,0.4) 50%, transparent 100%)"
+          }} />
 
-      {selected && (
-        <div style={{
-          position: "fixed", inset: 0,
-          background: "rgba(0,0,0,0.6)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          zIndex: 999, padding: 16
-        }} onClick={() => setSelected(null)}>
-          <div onClick={e => e.stopPropagation()} style={{
-            background: "white",
-            borderRadius: 24,
-            width: "100%",
-            maxWidth: 480,
-            maxHeight: "85vh",
-            overflowY: "auto",
-            boxShadow: "0 20px 60px rgba(0,0,0,0.3)"
+          {/* Left / Right arrows */}
+          <button onClick={prev} style={{
+            position: "absolute", left: 16, top: "50%",
+            transform: "translateY(-50%)",
+            background: "rgba(255,255,255,0.15)",
+            border: "1px solid rgba(255,255,255,0.2)",
+            color: "white", borderRadius: "50%",
+            width: 40, height: 40, cursor: "pointer",
+            fontSize: 18, display: "flex",
+            alignItems: "center", justifyContent: "center",
+            backdropFilter: "blur(4px)"
+          }}>‹</button>
+
+          <button onClick={next} style={{
+            position: "absolute", right: 16, top: "50%",
+            transform: "translateY(-50%)",
+            background: "rgba(255,255,255,0.15)",
+            border: "1px solid rgba(255,255,255,0.2)",
+            color: "white", borderRadius: "50%",
+            width: 40, height: 40, cursor: "pointer",
+            fontSize: 18, display: "flex",
+            alignItems: "center", justifyContent: "center",
+            backdropFilter: "blur(4px)"
+          }}>›</button>
+
+          {/* Bottom Content */}
+          <div style={{
+            position: "absolute", bottom: 0, left: 0, right: 0,
+            padding: "24px 24px 28px"
           }}>
-            <div style={{
-              height: 140,
-              background: "linear-gradient(135deg, #800020, #C9A84C)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 60, borderRadius: "24px 24px 0 0"
-            }}>{selected.emoji}</div>
-            <div style={{ padding: "24px" }}>
-              <h2 style={{ fontFamily: "Georgia, serif", fontSize: 24, color: "#800020" }}>{selected.couple}</h2>
-              <p style={{ color: "#6b6b6b", fontSize: 13, marginTop: 4 }}>{selected.city} · {selected.type} · {selected.guests} guests</p>
-              <p style={{ color: "#C9A84C", fontSize: 13, fontWeight: 600, marginTop: 2 }}>{selected.budget}</p>
+            {/* Type Badge */}
+            <span style={{
+              background: "rgba(231,114,145,0.25)",
+              border: "1px solid #E77291",
+              color: "#E77291", borderRadius: 999,
+              padding: "4px 14px", fontSize: 11,
+              fontWeight: 600, letterSpacing: 1,
+              display: "inline-block", marginBottom: 10
+            }}>{w.type}</span>
 
-              <p style={{ color: "#444", fontSize: 14, lineHeight: 1.7, marginTop: 16 }}>{selected.story}</p>
-
-              <div style={{ marginTop: 20 }}>
-                <p style={{ fontWeight: 700, color: "#800020", fontSize: 13, marginBottom: 8 }}>HIGHLIGHTS</p>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                  {selected.highlights.map(h => (
-                    <span key={h} style={{
-                      background: "#fff8e7",
-                      border: "1px solid #C9A84C",
-                      color: "#8a6000",
-                      padding: "4px 12px",
-                      borderRadius: 99,
-                      fontSize: 12
-                    }}>{h}</span>
-                  ))}
-                </div>
-              </div>
-
-              <div style={{ marginTop: 20 }}>
-                <p style={{ fontWeight: 700, color: "#800020", fontSize: 13, marginBottom: 8 }}>VENDORS USED</p>
-                {Object.entries(selected.vendors).map(([key, val]) => (
-                  <div key={key} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid #f0f0f0" }}>
-                    <span style={{ color: "#6b6b6b", fontSize: 13, textTransform: "capitalize" }}>{key}</span>
-                    <span style={{ color: "#1a1a1a", fontSize: 13, fontWeight: 500 }}>{val}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div style={{ display: "flex", gap: 10, marginTop: 24 }}>
-                <button onClick={() => navigate("/role")} style={{
-                  flex: 1, padding: "12px", background: "#800020", color: "white",
-                  border: "none", borderRadius: 999, fontSize: 14, fontWeight: 600, cursor: "pointer"
-                }}>View Similar Package</button>
-                <button onClick={() => setSelected(null)} style={{
-                  padding: "12px 20px", background: "#f5f0dc", color: "#800020",
-                  border: "none", borderRadius: 999, fontSize: 14, fontWeight: 600, cursor: "pointer"
-                }}>Close</button>
-              </div>
+            {/* Couple Name — hoverable */}
+            <div
+              onMouseEnter={() => setHoveredCouple(w.id)}
+              onMouseLeave={() => setHoveredCouple(null)}
+              style={{ cursor: "default" }}
+            >
+              <h2 style={{
+                fontFamily: "'DM Serif Display', serif",
+                fontStyle: "italic", color: "#FFFFFF",
+                fontSize: 32, lineHeight: 1.1, marginBottom: 6,
+                borderBottom: hoveredCouple === w.id
+                  ? "1px solid rgba(231,114,145,0.5)" : "1px solid transparent",
+                display: "inline-block", paddingBottom: 2,
+                transition: "border 0.2s"
+              }}>{w.couple}</h2>
             </div>
+
+            <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 13 }}>
+              {w.date} · {w.city}
+            </p>
           </div>
         </div>
-      )}
+
+        {/* Hover Story Card */}
+        <div style={{
+          background: hoveredCouple ? "rgba(255,255,255,0.06)" : "transparent",
+          border: hoveredCouple ? "1px solid rgba(231,114,145,0.2)" : "1px solid transparent",
+          borderRadius: 20, padding: hoveredCouple ? "18px 20px" : "0px 20px",
+          marginTop: 12,
+          maxHeight: hoveredCouple ? 200 : 0,
+          overflow: "hidden",
+          opacity: hoveredCouple ? 1 : 0,
+          transition: "all 0.4s ease",
+          backdropFilter: "blur(10px)"
+        }}>
+          <p style={{
+            color: "#E77291", fontSize: 11,
+            letterSpacing: 2, fontWeight: 600, marginBottom: 8
+          }}>THEIR STORY</p>
+          <p style={{
+            color: "rgba(255,255,255,0.8)", fontSize: 14,
+            lineHeight: 1.8, fontWeight: 300
+          }}>{w.story}</p>
+        </div>
+
+        {/* Dot indicators + thumbnails */}
+        <div style={{
+          display: "flex", justifyContent: "center",
+          gap: 16, marginTop: 20, alignItems: "center"
+        }}>
+          {weddings.map((wed, i) => (
+            <div
+              key={wed.id}
+              onClick={() => goTo(i)}
+              style={{
+                cursor: "pointer", transition: "all 0.3s ease",
+                opacity: i === current ? 1 : 0.4,
+                transform: i === current ? "scale(1.1)" : "scale(1)"
+              }}
+            >
+              <img
+                src={wed.image}
+                alt={wed.couple}
+                style={{
+                  width: i === current ? 52 : 40,
+                  height: i === current ? 52 : 40,
+                  borderRadius: "50%", objectFit: "cover",
+                  border: i === current
+                    ? "2px solid #E77291" : "2px solid rgba(255,255,255,0.2)",
+                  transition: "all 0.3s ease"
+                }}
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* CTA Button */}
+        <button
+          onClick={() => navigate("/role")}
+          style={{
+            width: "100%", marginTop: 24, padding: "16px",
+            background: "linear-gradient(135deg, #AC1634, #3E0014)",
+            color: "white", border: "none", borderRadius: 999,
+            fontSize: 15, fontWeight: 600, cursor: "pointer",
+            fontFamily: "'DM Sans', sans-serif",
+            boxShadow: "0 8px 24px rgba(172,22,52,0.4)",
+            letterSpacing: 0.5
+          }}>
+          Start Planning Your Wedding →
+        </button>
+
+        <p style={{
+          textAlign: "center", marginTop: 14,
+          color: "rgba(255,255,255,0.35)", fontSize: 12
+        }}>
+          Join 10,000+ couples who planned with Vivaha
+        </p>
+      </div>
     </div>
   );
 }
