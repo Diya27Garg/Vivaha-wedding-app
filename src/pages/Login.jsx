@@ -9,12 +9,19 @@ export default function Login({ setUser }) {
   const location = useLocation();
   const role = location.state?.role || "bride";
 
+  // FIXED: Properly define the handle function
   const handle = async () => {
     if (!email || !password) return;
     setVerifying(true);
     await new Promise(r => setTimeout(r, 2000));
     setUser({ email, name: email.split("@")[0], role, premium: false });
-navigate("/home");
+    
+    // Navigate based on role
+    if (role === "vendor") {
+      navigate("/onboarding/vendor");
+    } else {
+      navigate("/couple-form");
+    }
   };
 
   if (verifying) return (

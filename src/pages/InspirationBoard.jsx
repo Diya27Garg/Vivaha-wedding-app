@@ -1,211 +1,623 @@
+// src/pages/InspirationBoard.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, Home, ClipboardList, Sparkles, Package, User, X, Heart } from "lucide-react";
+import { 
+  Heart, Home, Calendar, Package, User, Plus, Search, 
+  Image, Link2, X, Check, Grid3x3, List, Bookmark, Share2
+} from "lucide-react";
 
-const categories = ["All", "Decor", "Outfits", "Jewelry", "Makeup", "Venue"];
-const sampleImages = [
-  { id: 1, category: "Decor", title: "Floral Mandap", emoji: "🌸", bg: "#FDEEF3" },
-  { id: 2, category: "Outfits", title: "Bridal Lehenga", emoji: "👗", bg: "#F3EEFF" },
-  { id: 3, category: "Venue", title: "Palace Venue", emoji: "🏰", bg: "#EEF3FF" },
-  { id: 4, category: "Jewelry", title: "Gold Necklace", emoji: "📿", bg: "#FFF8EE" },
-  { id: 5, category: "Makeup", title: "Bridal Glow", emoji: "✨", bg: "#FFF0EE" },
-  { id: 6, category: "Decor", title: "Fairy Lights", emoji: "🌟", bg: "#FFFBEE" },
-  { id: 7, category: "Outfits", title: "Groom Sherwani", emoji: "🤵", bg: "#EEFFF5" },
-  { id: 8, category: "Venue", title: "Beach Wedding", emoji: "🌊", bg: "#EEF8FF" },
-  { id: 9, category: "Jewelry", title: "Diamond Ring", emoji: "💍", bg: "#FDEEF3" },
-  { id: 10, category: "Makeup", title: "Smokey Eyes", emoji: "💄", bg: "#F5EEFD" },
-];
-
-const realWeddings = [
-  { couple: "Riya & Arjun", city: "Udaipur", type: "Destination", emoji: "🏰" },
-  { couple: "Meera & Karan", city: "Goa", type: "Beach", emoji: "🌊" },
-  { couple: "Ananya & Rohan", city: "Jaipur", type: "Traditional", emoji: "🐘" },
-];
-
-export default function InspirationBoard() {
+export default function InspirationBoard({ user = { premium: false } }) {
   const navigate = useNavigate();
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [saved, setSaved] = useState([]);
-  const [newBoard, setNewBoard] = useState(false);
-  const [boardName, setBoardName] = useState("");
-  const [boards, setBoards] = useState(["My Dream Wedding", "Decor Ideas"]);
-
-  const navItems = [
-    { icon: <Home size={20} strokeWidth={1.5} />, label: "Home", path: "/home" },
-    { icon: <ClipboardList size={20} strokeWidth={1.5} />, label: "Checklist", path: "/checklist" },
-    { icon: <Sparkles size={20} strokeWidth={1.5} />, label: "Inspire", path: "/inspiration" },
-    { icon: <Package size={20} strokeWidth={1.5} />, label: "Package", path: "/package" },
-    { icon: <User size={20} strokeWidth={1.5} />, label: "Profile", path: "/profile" },
-  ];
-
-  const filtered = activeCategory === "All" ? sampleImages : sampleImages.filter(i => i.category === activeCategory);
-  const toggleSave = (id) => setSaved(s => s.includes(id) ? s.filter(x => x !== id) : [...s, id]);
-  const addBoard = () => {
-    if (boardName.trim()) { setBoards(b => [...b, boardName.trim()]); setBoardName(""); setNewBoard(false); }
+  const [activeBoard, setActiveBoard] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [viewMode, setViewMode] = useState("grid");
+  
+  const [boards, setBoards] = useState([
+    { 
+      id: 1, 
+      name: "Dream Wedding", 
+      cover: "https://images.unsplash.com/photo-1519741497674-611481863552",
+      itemCount: 12,
+      sharedWithVendors: false
+    },
+    { 
+      id: 2, 
+      name: "Decor Ideas", 
+      cover: "https://images.unsplash.com/photo-1519225421980-715cb0215aed",
+      itemCount: 8,
+      sharedWithVendors: true
+    },
+    { 
+      id: 3, 
+      name: "Outfit Inspiration", 
+      cover: "https://images.unsplash.com/photo-1595777457583-95e059d581b8",
+      itemCount: 15,
+      sharedWithVendors: false
+    }
+  ]);
+  
+  const [pins, setPins] = useState([
+    {
+      id: 1,
+      boardId: 1,
+      image: "https://images.unsplash.com/photo-1519225421980-715cb0215aed",
+      title: "Floral Mandap",
+      category: "Decor",
+      addedBy: "You"
+    },
+    {
+      id: 2,
+      boardId: 1,
+      image: "https://images.unsplash.com/photo-1519741497674-611481863552",
+      title: "Palace Venue",
+      category: "Venue",
+      addedBy: "You"
+    },
+    {
+      id: 3,
+      boardId: 2,
+      image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8",
+      title: "Bridal Lehenga",
+      category: "Outfits",
+      addedBy: "Rohan"
+    },
+    {
+      id: 4,
+      boardId: 3,
+      image: "https://images.unsplash.com/photo-1532712938311-25548b2e0a1b",
+      title: "Gold Jewelry",
+      category: "Jewelry",
+      addedBy: "You"
+    }
+  ]);
+  
+  const [newPin, setNewPin] = useState({
+    image: "",
+    title: "",
+    category: "Decor"
+  });
+  
+  const categories = ["Decor", "Outfits", "Jewelry", "Makeup", "Venue", "Food"];
+  
+  const filteredPins = pins.filter(pin => 
+    (activeBoard ? pin.boardId === activeBoard.id : true) &&
+    (searchTerm === "" || pin.title.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+  
+  const handleAddPin = () => {
+    if (!newPin.image || !newPin.title) return;
+    
+    const pin = {
+      id: Date.now(),
+      boardId: activeBoard?.id || boards[0].id,
+      image: newPin.image,
+      title: newPin.title,
+      category: newPin.category,
+      addedBy: "You"
+    };
+    
+    setPins([pin, ...pins]);
+    setBoards(boards.map(board => 
+      board.id === pin.boardId 
+        ? { ...board, itemCount: board.itemCount + 1 }
+        : board
+    ));
+    setShowAddModal(false);
+    setNewPin({ image: "", title: "", category: "Decor" });
   };
-
+  
+  const toggleShareWithVendors = (boardId) => {
+    setBoards(boards.map(board => 
+      board.id === boardId 
+        ? { ...board, sharedWithVendors: !board.sharedWithVendors }
+        : board
+    ));
+  };
+  
   return (
-    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#FDF0F3", fontFamily: "'DM Sans', sans-serif" }}>
-
-      <div style={{
-        background: "#3E0014", padding: "20px",
-        display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0
-      }}>
-        <button onClick={() => navigate("/home")} style={{
-          background: "rgba(231,114,145,0.15)", border: "1px solid rgba(231,114,145,0.3)",
-          color: "#E77291", cursor: "pointer", display: "flex", padding: "8px", borderRadius: 10
-        }}>
-          <ArrowLeft size={20} strokeWidth={1.5} />
-        </button>
-        <h1 style={{ fontFamily: "'DM Serif Display', serif", fontStyle: "italic", color: "#FFFFFF", fontSize: 24 }}>
-          Inspiration
-        </h1>
-        <button onClick={() => setNewBoard(true)} style={{
-          background: "rgba(231,114,145,0.15)", border: "1px solid rgba(231,114,145,0.3)",
-          color: "#E77291", cursor: "pointer", display: "flex",
-          padding: "8px 14px", borderRadius: 10, fontSize: 13, fontWeight: 500,
-          alignItems: "center", gap: 4
-        }}>
-          <Plus size={14} strokeWidth={2} /> Board
+    <div style={styles.container}>
+      <div style={styles.header}>
+        <h1 style={styles.title}>Inspiration Board</h1>
+        <button style={styles.addButton} onClick={() => setShowAddModal(true)}>
+          <Plus size={20} /> Add Idea
         </button>
       </div>
-
-      <div style={{ flex: 1, overflowY: "auto", padding: "20px 16px" }}>
-
-        {/* My Boards */}
-        <p style={{ fontSize: 11, color: "#AC1634", fontWeight: 600, letterSpacing: 2, marginBottom: 12 }}>MY BOARDS</p>
-        <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 16 }}>
-          {boards.map(b => (
-            <div key={b} style={{
-              background: "#3E0014", borderRadius: 14, padding: "10px 18px",
-              color: "#E77291", fontSize: 13, fontWeight: 500,
-              whiteSpace: "nowrap", cursor: "pointer", flexShrink: 0
-            }}>{b}</div>
-          ))}
-          <div onClick={() => setNewBoard(true)} style={{
-            background: "white", border: "1.5px dashed #F5D0DA",
-            borderRadius: 14, padding: "10px 18px",
-            color: "#AC1634", fontSize: 13, fontWeight: 500,
-            whiteSpace: "nowrap", cursor: "pointer", flexShrink: 0,
-            display: "flex", alignItems: "center", gap: 6
-          }}>
-            <Plus size={14} strokeWidth={2} /> New
-          </div>
-        </div>
-
-        {/* Category Filter */}
-        <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 16 }}>
-          {categories.map(c => (
-            <button key={c} onClick={() => setActiveCategory(c)} style={{
-              padding: "8px 18px", borderRadius: 999,
-              border: `1.5px solid ${activeCategory === c ? "#3E0014" : "#F5D0DA"}`,
-              background: activeCategory === c ? "#3E0014" : "white",
-              color: activeCategory === c ? "white" : "#7A5560",
-              fontWeight: 500, fontSize: 13, cursor: "pointer", flexShrink: 0
-            }}>{c}</button>
-          ))}
-        </div>
-
-        {/* Image Grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 24 }}>
-          {filtered.map(img => (
-            <div key={img.id} style={{
-              background: img.bg, borderRadius: 20, overflow: "hidden",
-              boxShadow: "0 2px 12px rgba(62,0,20,0.08)",
-              border: "1px solid #F5D0DA", position: "relative"
-            }}>
-              <div style={{ height: 110, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 46 }}>
-                {img.emoji}
+      
+      <div style={styles.searchContainer}>
+        <Search size={18} color="#999" />
+        <input
+          type="text"
+          style={styles.searchInput}
+          placeholder="Search inspiration..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+      
+      <div style={styles.viewToggle}>
+        <button 
+          style={{...styles.viewBtn, ...(viewMode === "grid" ? styles.viewBtnActive : {})}}
+          onClick={() => setViewMode("grid")}
+        >
+          <Grid3x3 size={18} /> Grid
+        </button>
+        <button 
+          style={{...styles.viewBtn, ...(viewMode === "list" ? styles.viewBtnActive : {})}}
+          onClick={() => setViewMode("list")}
+        >
+          <List size={18} /> List
+        </button>
+      </div>
+      
+      <div style={styles.boardsSection}>
+        <h2 style={styles.sectionTitle}>My Boards</h2>
+        <div style={styles.boardsGrid}>
+          {boards.map(board => (
+            <div
+              key={board.id}
+              style={{...styles.boardCard, ...(activeBoard?.id === board.id ? styles.boardCardActive : {})}}
+              onClick={() => setActiveBoard(activeBoard?.id === board.id ? null : board)}
+            >
+              <img src={board.cover} alt={board.name} style={styles.boardCover} />
+              <div style={styles.boardInfo}>
+                <div>
+                  <h3 style={styles.boardName}>{board.name}</h3>
+                  <p style={styles.boardCount}>{board.itemCount} items</p>
+                </div>
+                <button 
+                  style={styles.shareButton}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleShareWithVendors(board.id);
+                  }}
+                  title={board.sharedWithVendors ? "Shared with vendors" : "Private board"}
+                >
+                  {board.sharedWithVendors ? <Share2 size={16} color="#AC1634" /> : "🔒"}
+                </button>
               </div>
-              <div style={{ padding: "10px 14px 14px" }}>
-                <p style={{ fontWeight: 600, fontSize: 13, color: "#1A1A1A" }}>{img.title}</p>
-                <p style={{ fontSize: 10, color: "#AC1634", marginTop: 3, letterSpacing: 1, fontWeight: 600 }}>
-                  {img.category.toUpperCase()}
-                </p>
+            </div>
+          ))}
+        </div>
+      </div>
+      
+      <div style={styles.pinsSection}>
+        <div style={styles.sectionHeader}>
+          <h2 style={styles.sectionTitle}>
+            {activeBoard ? activeBoard.name : "All Ideas"}
+          </h2>
+          {activeBoard && (
+            <button style={styles.closeBoardBtn} onClick={() => setActiveBoard(null)}>
+              <X size={16} /> Close Board
+            </button>
+          )}
+        </div>
+        
+        <div style={viewMode === "grid" ? styles.pinsGrid : styles.pinsList}>
+          {filteredPins.length === 0 ? (
+            <div style={styles.emptyState}>
+              <Image size={48} color="#CCC" />
+              <p>No ideas yet. Click "Add Idea" to get started!</p>
+            </div>
+          ) : (
+            filteredPins.map(pin => (
+              <div key={pin.id} style={styles.pinCard}>
+                <img src={pin.image} alt={pin.title} style={styles.pinImage} />
+                <div style={styles.pinInfo}>
+                  <h4 style={styles.pinTitle}>{pin.title}</h4>
+                  <div style={styles.pinMeta}>
+                    <span style={styles.pinCategory}>{pin.category}</span>
+                    <span style={styles.pinAddedBy}>Added by {pin.addedBy}</span>
+                  </div>
+                  <div style={styles.pinActions}>
+                    <button style={styles.pinActionBtn}>
+                      <Heart size={16} /> Save
+                    </button>
+                    <button style={styles.pinActionBtn}>
+                      <Bookmark size={16} /> Collect
+                    </button>
+                  </div>
+                </div>
               </div>
-              <button onClick={() => toggleSave(img.id)} style={{
-                position: "absolute", top: 10, right: 10,
-                background: "rgba(255,255,255,0.9)", border: "none",
-                borderRadius: "50%", width: 32, height: 32, cursor: "pointer",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
-              }}>
-                <Heart size={14} fill={saved.includes(img.id) ? "#AC1634" : "none"} color="#AC1634" strokeWidth={1.5} />
+            ))
+          )}
+        </div>
+      </div>
+      
+      {showAddModal && (
+        <div style={styles.modalOverlay} onClick={() => setShowAddModal(false)}>
+          <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div style={styles.modalHeader}>
+              <h3 style={styles.modalTitle}>Add New Idea</h3>
+              <button style={styles.closeBtn} onClick={() => setShowAddModal(false)}>
+                <X size={20} />
               </button>
             </div>
-          ))}
-        </div>
-
-        {/* Real Weddings */}
-        <p style={{ fontSize: 11, color: "#AC1634", fontWeight: 600, letterSpacing: 2, marginBottom: 12 }}>
-          REAL WEDDINGS
-        </p>
-        <div style={{ display: "flex", gap: 12, overflowX: "auto", paddingBottom: 8 }}>
-          {realWeddings.map(w => (
-            <div key={w.couple} style={{
-              background: "white", borderRadius: 18, padding: "18px",
-              minWidth: 155, flexShrink: 0,
-              boxShadow: "0 2px 12px rgba(62,0,20,0.07)",
-              border: "1px solid #F5D0DA"
-            }}>
-              <div style={{ fontSize: 30, marginBottom: 10 }}>{w.emoji}</div>
-              <p style={{ fontWeight: 600, color: "#3E0014", fontSize: 13, fontFamily: "'DM Serif Display', serif" }}>
-                {w.couple}
-              </p>
-              <p style={{ color: "#7A5560", fontSize: 11, marginTop: 4 }}>{w.city} · {w.type}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {newBoard && (
-        <div style={{
-          position: "fixed", inset: 0, background: "rgba(62,0,20,0.6)",
-          display: "flex", alignItems: "flex-end", zIndex: 999
-        }}>
-          <div style={{
-            background: "white", width: "100%", maxWidth: 430, margin: "0 auto",
-            borderRadius: "24px 24px 0 0", padding: "28px 20px"
-          }}>
-            <h3 style={{ fontFamily: "'DM Serif Display', serif", color: "#3E0014", fontSize: 22, marginBottom: 20 }}>
-              Create New Board
-            </h3>
-            <input value={boardName} onChange={e => setBoardName(e.target.value)}
-              placeholder="e.g. Decor Ideas, Outfit Inspo..."
-              style={{
-                width: "100%", padding: "14px 16px",
-                border: "1.5px solid #F5D0DA", borderRadius: 14,
-                fontSize: 15, outline: "none", marginBottom: 16,
-                fontFamily: "'DM Sans', sans-serif", color: "#1A1A1A"
-              }} />
-            <div style={{ display: "flex", gap: 10 }}>
-              <button onClick={() => setNewBoard(false)} style={{
-                flex: 1, padding: "13px", background: "#FDF0F3",
-                color: "#AC1634", border: "1px solid #F5D0DA",
-                borderRadius: 999, fontWeight: 600, cursor: "pointer"
-              }}>Cancel</button>
-              <button onClick={addBoard} style={{
-                flex: 2, padding: "13px", background: "#3E0014",
-                color: "white", border: "none", borderRadius: 999,
-                fontWeight: 600, cursor: "pointer"
-              }}>Create Board</button>
+            
+            <div style={styles.modalContent}>
+              <input
+                type="text"
+                style={styles.modalInput}
+                placeholder="Image URL"
+                value={newPin.image}
+                onChange={(e) => setNewPin({...newPin, image: e.target.value})}
+              />
+              <input
+                type="text"
+                style={styles.modalInput}
+                placeholder="Title"
+                value={newPin.title}
+                onChange={(e) => setNewPin({...newPin, title: e.target.value})}
+              />
+              <select
+                style={styles.modalSelect}
+                value={newPin.category}
+                onChange={(e) => setNewPin({...newPin, category: e.target.value})}
+              >
+                {categories.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+              
+              <div style={styles.modalActions}>
+                <button style={styles.cancelBtn} onClick={() => setShowAddModal(false)}>
+                  Cancel
+                </button>
+                <button style={styles.addBtn} onClick={handleAddPin}>
+                  Add to {activeBoard ? activeBoard.name : boards[0].name}
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
-
-      <div className="bottom-nav">
-        {navItems.map(n => (
-          <button key={n.path} onClick={() => navigate(n.path)} style={{
-            display: "flex", flexDirection: "column", alignItems: "center",
-            gap: 5, background: "none", border: "none", cursor: "pointer",
-            color: window.location.pathname === n.path ? "#AC1634" : "#CCBBBB"
-          }}>
-            {n.icon}
-            <span style={{ fontSize: 10, fontWeight: 500 }}>{n.label}</span>
-          </button>
-        ))}
+      
+      {/* Bottom Navigation */}
+      <div className="bottom-nav" style={styles.bottomNav}>
+        <button onClick={() => navigate("/home")} style={styles.navItem}>
+          <Home size={22} />
+          <span>Home</span>
+        </button>
+        <button onClick={() => navigate("/checklist")} style={styles.navItem}>
+          <Calendar size={22} />
+          <span>Checklist</span>
+        </button>
+        <button onClick={() => navigate("/inspiration")} style={{...styles.navItem, ...styles.navItemActive}}>
+          <Heart size={22} />
+          <span>Inspire</span>
+        </button>
+        <button onClick={() => navigate("/package")} style={styles.navItem}>
+          <Package size={22} />
+          <span>Package</span>
+        </button>
+        <button onClick={() => navigate("/profile")} style={styles.navItem}>
+          <User size={22} />
+          <span>Profile</span>
+        </button>
       </div>
     </div>
   );
 }
+
+const styles = {
+  container: {
+    minHeight: "100vh",
+    background: "#FDF0F3",
+    fontFamily: "'DM Sans', sans-serif",
+    paddingBottom: "80px"
+  },
+  header: {
+    background: "#3E0014",
+    padding: "20px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    position: "sticky",
+    top: 0,
+    zIndex: 100
+  },
+  title: {
+    fontFamily: "'DM Serif Display', serif",
+    fontStyle: "italic",
+    fontSize: "24px",
+    color: "white",
+    margin: 0
+  },
+  addButton: {
+    background: "#E77291",
+    border: "none",
+    borderRadius: "999px",
+    padding: "8px 16px",
+    color: "#3E0014",
+    fontWeight: 600,
+    fontSize: "13px",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    gap: "6px"
+  },
+  searchContainer: {
+    background: "white",
+    margin: "16px",
+    padding: "12px 16px",
+    borderRadius: "999px",
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    border: "1px solid #F5D0DA"
+  },
+  searchInput: {
+    flex: 1,
+    border: "none",
+    outline: "none",
+    fontSize: "14px",
+    fontFamily: "'DM Sans', sans-serif"
+  },
+  viewToggle: {
+    display: "flex",
+    gap: "10px",
+    margin: "0 16px 16px"
+  },
+  viewBtn: {
+    flex: 1,
+    padding: "8px",
+    borderRadius: "999px",
+    border: "1px solid #F5D0DA",
+    background: "white",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "6px",
+    fontSize: "13px"
+  },
+  viewBtnActive: {
+    background: "#3E0014",
+    color: "white",
+    borderColor: "#3E0014"
+  },
+  boardsSection: {
+    padding: "0 16px 16px"
+  },
+  sectionTitle: {
+    fontSize: "18px",
+    fontWeight: 600,
+    color: "#3E0014",
+    marginBottom: "12px"
+  },
+  boardsGrid: {
+    display: "flex",
+    gap: "12px",
+    overflowX: "auto",
+    paddingBottom: "8px"
+  },
+  boardCard: {
+    minWidth: "200px",
+    background: "white",
+    borderRadius: "16px",
+    overflow: "hidden",
+    border: "2px solid transparent",
+    cursor: "pointer"
+  },
+  boardCardActive: {
+    borderColor: "#AC1634"
+  },
+  boardCover: {
+    width: "100%",
+    height: "120px",
+    objectFit: "cover"
+  },
+  boardInfo: {
+    padding: "12px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center"
+  },
+  boardName: {
+    fontSize: "14px",
+    fontWeight: 600,
+    margin: 0
+  },
+  boardCount: {
+    fontSize: "11px",
+    color: "#999",
+    margin: "4px 0 0"
+  },
+  shareButton: {
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    padding: "4px",
+    fontSize: "16px"
+  },
+  pinsSection: {
+    padding: "16px"
+  },
+  sectionHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "16px"
+  },
+  closeBoardBtn: {
+    background: "#F5D0DA",
+    border: "none",
+    borderRadius: "999px",
+    padding: "6px 12px",
+    fontSize: "12px",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    gap: "4px"
+  },
+  pinsGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+    gap: "16px"
+  },
+  pinsList: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "12px"
+  },
+  pinCard: {
+    background: "white",
+    borderRadius: "16px",
+    overflow: "hidden",
+    border: "1px solid #F5D0DA"
+  },
+  pinImage: {
+    width: "100%",
+    height: "160px",
+    objectFit: "cover"
+  },
+  pinInfo: {
+    padding: "12px"
+  },
+  pinTitle: {
+    fontSize: "14px",
+    fontWeight: 600,
+    margin: "0 0 6px",
+    color: "#3E0014"
+  },
+  pinMeta: {
+    display: "flex",
+    justifyContent: "space-between",
+    fontSize: "11px",
+    marginBottom: "10px"
+  },
+  pinCategory: {
+    background: "#FDF0F3",
+    padding: "2px 8px",
+    borderRadius: "999px",
+    color: "#AC1634"
+  },
+  pinAddedBy: {
+    color: "#999"
+  },
+  pinActions: {
+    display: "flex",
+    gap: "12px"
+  },
+  pinActionBtn: {
+    background: "none",
+    border: "none",
+    fontSize: "12px",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    gap: "4px",
+    color: "#666"
+  },
+  emptyState: {
+    textAlign: "center",
+    padding: "60px 20px",
+    color: "#999"
+  },
+  modalOverlay: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: "rgba(0,0,0,0.5)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 1000
+  },
+  modal: {
+    background: "white",
+    borderRadius: "24px",
+    width: "90%",
+    maxWidth: "400px"
+  },
+  modalHeader: {
+    padding: "20px",
+    borderBottom: "1px solid #F5D0DA",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center"
+  },
+  modalTitle: {
+    fontSize: "18px",
+    fontWeight: 600,
+    margin: 0
+  },
+  closeBtn: {
+    background: "none",
+    border: "none",
+    cursor: "pointer"
+  },
+  modalContent: {
+    padding: "20px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "12px"
+  },
+  modalInput: {
+    padding: "12px",
+    borderRadius: "12px",
+    border: "1px solid #F5D0DA",
+    fontSize: "14px",
+    outline: "none"
+  },
+  modalSelect: {
+    padding: "12px",
+    borderRadius: "12px",
+    border: "1px solid #F5D0DA",
+    fontSize: "14px",
+    outline: "none"
+  },
+  modalActions: {
+    display: "flex",
+    gap: "12px",
+    marginTop: "8px"
+  },
+  cancelBtn: {
+    flex: 1,
+    padding: "12px",
+    borderRadius: "999px",
+    border: "1px solid #F5D0DA",
+    background: "white",
+    cursor: "pointer"
+  },
+  addBtn: {
+    flex: 2,
+    padding: "12px",
+    borderRadius: "999px",
+    border: "none",
+    background: "#3E0014",
+    color: "white",
+    cursor: "pointer",
+    fontWeight: 600
+  },
+  bottomNav: {
+    position: "fixed",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    maxWidth: "430px",
+    margin: "0 auto",
+    background: "white",
+    borderTop: "1px solid #F5D0DA",
+    padding: "10px 20px",
+    display: "flex",
+    justifyContent: "space-around",
+    zIndex: 100
+  },
+  navItem: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "4px",
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    color: "#999",
+    fontSize: "11px"
+  },
+  navItemActive: {
+    color: "#AC1634"
+  }
+};
