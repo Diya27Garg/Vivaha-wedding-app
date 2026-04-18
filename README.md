@@ -139,51 +139,55 @@ This project was developed with guidance from AI tools (Claude by Anthropic, Git
 
 ---
 
+## 📁 Repository Structure
+
+```
 Vivaha-wedding-app/
 ├── .github/
 │   └── workflows/
-│       └── ci.yml                  # GitHub Actions CI/CD pipeline
+│       └── ci.yml
 ├── docs/
-│   ├── SRS.md                      # Software Requirements Specification (IEEE 830)
-│   ├── SDD.md                      # Software Design Description (IEEE 1016)
+│   ├── SRS.md
+│   ├── SDD.md
 │   └── diagrams/
-│       ├── use_case.png            # UML Use Case Diagram
-│       ├── class_diagram.png       # UML Class Diagram
-│       ├── sequence.png            # UML Sequence Diagram
-│       ├── er_diagram.png          # Entity Relationship Diagram
-│       └── dfd.png                 # Data Flow Diagram
+│       ├── use_case.png
+│       ├── class_diagram.png
+│       ├── sequence.png
+│       ├── er_diagram.png
+│       └── dfd.png
 ├── src/
 │   ├── pages/
-│   │   ├── SplashScreen.jsx        # Branded launch screen
-│   │   ├── IntroScreens.jsx        # 3-slide onboarding carousel
-│   │   ├── RealWeddings.jsx        # Auto-sliding wedding showcase
-│   │   ├── RoleSelection.jsx       # Bride / Groom / Vendor selection
-│   │   ├── Login.jsx               # Auth with verification animation
-│   │   ├── CoupleForm.jsx          # Multi-step couple onboarding
-│   │   ├── VendorForm.jsx          # Multi-step vendor onboarding
-│   │   ├── CoupleDashboard.jsx     # Main couple home page
-│   │   ├── Checklist.jsx           # Interactive wedding checklist
-│   │   ├── InspirationBoard.jsx    # Mood board with category filter
-│   │   ├── BuildPackage.jsx        # Vendor package builder
-│   │   ├── CoupleProfile.jsx       # Editable couple profile
-│   │   ├── PremiumPage.jsx         # Premium upgrade + payment flow
-│   │   ├── VendorDashboard.jsx     # Vendor bookings and services
-│   │   ├── Messaging.jsx           # Couple ↔ Vendor messaging
-│   │   └── AdminDashboard.jsx      # Platform admin panel
-│   ├── App.jsx                     # Root component + routing
-│   ├── firebase.js                 # Firebase config and exports
-│   ├── theme.js                    # Design tokens and color system
-│   ├── index.css                   # Global styles and bottom nav
-│   └── main.jsx                    # React entry point (Vite)
+│   │   ├── SplashScreen.jsx
+│   │   ├── IntroScreens.jsx
+│   │   ├── RealWeddings.jsx
+│   │   ├── RoleSelection.jsx
+│   │   ├── Login.jsx
+│   │   ├── CoupleForm.jsx
+│   │   ├── VendorForm.jsx
+│   │   ├── CoupleDashboard.jsx
+│   │   ├── Checklist.jsx
+│   │   ├── InspirationBoard.jsx
+│   │   ├── BuildPackage.jsx
+│   │   ├── CoupleProfile.jsx
+│   │   ├── PremiumPage.jsx
+│   │   ├── VendorDashboard.jsx
+│   │   ├── Messaging.jsx
+│   │   └── AdminDashboard.jsx
+│   ├── App.jsx
+│   ├── firebase.js
+│   ├── theme.js
+│   ├── index.css
+│   └── main.jsx
 ├── tests/
-│   └── test_cases.md               # 37 unit and integration test cases
-├── .env.example                    # Environment variables template
-├── .gitignore                      # Git ignore rules
-├── CONTRIBUTING.md                 # Local setup and contribution guide
-├── LICENSE                         # MIT License
-├── README.md                       # This file
-├── package.json                    # Node.js dependencies
-└── vercel.json                     # Vercel deployment configuration
+│   └── test_cases.md
+├── .env.example
+├── .gitignore
+├── CONTRIBUTING.md
+├── LICENSE
+├── README.md
+├── package.json
+└── vercel.json
+```
 
 ## 🚀 Getting Started
 
