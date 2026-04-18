@@ -139,7 +139,6 @@ This project was developed with guidance from AI tools (Claude by Anthropic, Git
 
 ---
 
-## 📁 Repository Structure
 Vivaha-wedding-app/
 ├── .github/
 │   └── workflows/
@@ -185,8 +184,6 @@ Vivaha-wedding-app/
 ├── README.md                       # This file
 ├── package.json                    # Node.js dependencies
 └── vercel.json                     # Vercel deployment configuration
-
----
 
 ## 🚀 Getting Started
 
