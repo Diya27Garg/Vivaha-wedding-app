@@ -22,7 +22,7 @@ import InvitationDesign from "./pages/InvitationDesign";
 import BudgetPlanner from "./pages/BudgetPlanner";
 import WellnessHub from "./pages/WellnessHub";
 import SustainabilityHub from "./pages/SustainabilityHub";
-
+import AdminLogin from "./pages/AdminLogin";
 
 function App() {
   const [user, setUser] = useState({ 
@@ -30,6 +30,8 @@ function App() {
     role: "couple", 
     premium: false 
   });
+  
+  const [admin, setAdmin] = useState(null);
 
   // Debug log to check if App is rendering
   console.log("App rendering, user:", user);
@@ -51,13 +53,13 @@ function App() {
         <Route path="/profile" element={<CoupleProfile setUser={setUser} user={user} />} />
         <Route path="/messages" element={<Messaging />} />
         <Route path="/vendor/dashboard" element={<VendorDashboard user={user} setUser={setUser} />} />
-        <Route path="/admin" element={<AdminDashboard setUser={setUser} />} />
+        <Route path="/admin-login" element={<AdminLogin setAdmin={setAdmin} />} />
+        <Route path="/admin" element={<AdminDashboard admin={admin} setAdmin={setAdmin} />} />
         <Route path="/premium" element={<PremiumPage user={user} setUser={setUser} />} />
         <Route path="/invitation-design" element={<InvitationDesign />} />
         <Route path="/budget-planner" element={<BudgetPlanner />} />
         <Route path="/wellness" element={<WellnessHub />} />
         <Route path="/sustainability" element={<SustainabilityHub />} />
-        
       </Routes>
     </BrowserRouter>
   );

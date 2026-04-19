@@ -1,276 +1,493 @@
-import { useState, useEffect, useRef } from "react";
+// src/pages/RealWeddings.jsx
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Heart, MapPin, Calendar, Users, Sparkles, ArrowRight, Play, Pause } from "lucide-react";
+import HindiLogo from "../components/HindiLogo";
 
 const weddings = [
   {
     id: 1,
-    couple: "Riya & Arjun",
-    date: "December 2024",
-    city: "Udaipur",
-    type: "Destination",
-    image: "https://images.unsplash.com/photo-1519741497674-611481863552?w=600&q=80",
-    story: "Riya and Arjun planned their dream lakeside wedding in just 3 months using Vivaha. From finding their royal palace venue to booking a Power Pair of photographer and decorator — everything was coordinated in one place. Vivaha's AI assistant even reminded them of every milestone on time.",
+    couple: "Meera & Karan",
+    date: "February 2025",
+    location: "Goa",
+    type: "Beach Wedding",
+    image: "https://images.unsplash.com/photo-1519741497674-611481863552",
+    story: "A beautiful sunset ceremony by the Arabian Sea with 120 close friends and family. The couple wanted an intimate beach wedding with boho vibes.",
+    budget: "₹25L",
+    guests: 120,
+    vendors: ["Dream Venues", "Royal Blooms Decor", "Lens & Love Studio"]
   },
   {
     id: 2,
-    couple: "Meera & Karan",
-    date: "February 2025",
-    city: "Goa",
-    type: "Beach Wedding",
-    image: "https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=600&q=80",
-    story: "Meera and Karan wanted an intimate beach wedding but had no idea where to start. Vivaha's Build Package feature helped them assemble the perfect vendor team — a boho decorator, sunset photographer, and live music duo — all within their ₹15L budget.",
+    couple: "Priya & Raj",
+    date: "December 2024",
+    location: "Jaipur",
+    type: "Royal Palace",
+    image: "https://images.unsplash.com/photo-1519167758481-83f550bb49b3",
+    story: "A grand royal wedding at City Palace with traditional Rajasthani decor and 500 guests.",
+    budget: "₹75L",
+    guests: 500,
+    vendors: ["Grand Feast Caterers", "Royal Blooms Decor", "Beat Masters DJ"]
   },
   {
     id: 3,
-    couple: "Ananya & Rohan",
+    couple: "Anjali & Vikram",
     date: "November 2024",
-    city: "Jaipur",
-    type: "Royal Traditional",
-    image: "https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=600&q=80",
-    story: "With 500 guests and a royal Rajasthani theme, Ananya and Rohan needed serious coordination. Vivaha's checklist kept 47 tasks on track, and the inspiration board helped them nail the marigold-and-gold aesthetic. Their vendor team was booked through Power Pairs in a single afternoon.",
-  },
-  {
-    id: 4,
-    couple: "Priya & Vikram",
-    date: "January 2025",
-    city: "Mumbai",
-    type: "Rooftop Intimate",
-    image: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&q=80",
-    story: "Priya and Vikram chose a minimalist rooftop wedding for 80 guests. They used Vivaha to shortlist vendors, track their ₹12L budget, and coordinate with their fiancé in real time through the couple collaboration feature. The whole planning process took just 6 weeks.",
-  },
-  {
-    id: 5,
-    couple: "Simran & Aditya",
-    date: "March 2025",
-    city: "Delhi",
-    type: "Garden Wedding",
-    image: "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=600&q=80",
-    story: "Simran and Aditya discovered their dream florist and makeup artist through Vivaha's Top Vendors section. The inspiration board helped them visualize their garden wedding aesthetic months before the event, and the AI assistant created a perfect 6-month timeline for them.",
-  },
+    location: "Udaipur",
+    type: "Lake Wedding",
+    image: "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6",
+    story: "A magical wedding by Lake Pichola with floating decor and fireworks.",
+    budget: "₹50L",
+    guests: 250,
+    vendors: ["Lens & Love Studio", "Royal Blooms Decor", "Glam by Priya"]
+  }
 ];
 
 export default function RealWeddings() {
   const navigate = useNavigate();
-  const [current, setCurrent] = useState(0);
-  const [hoveredCouple, setHoveredCouple] = useState(null);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const intervalRef = useRef(null);
-
-  const goTo = (index) => {
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrent(index);
-      setIsTransitioning(false);
-    }, 300);
-  };
-
-  const next = () => goTo((current + 1) % weddings.length);
-  const prev = () => goTo((current - 1 + weddings.length) % weddings.length);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [selectedWedding, setSelectedWedding] = useState(null);
 
   useEffect(() => {
-    intervalRef.current = setInterval(next, 4000);
-    return () => clearInterval(intervalRef.current);
-  }, [current]);
+    let interval;
+    if (isPlaying) {
+      interval = setInterval(() => {
+        setCurrentIndex((prev) => (prev + 1) % weddings.length);
+      }, 5000);
+    }
+    return () => clearInterval(interval);
+  }, [isPlaying]);
 
-  const pauseAutoplay = () => clearInterval(intervalRef.current);
-  const resumeAutoplay = () => {
-    intervalRef.current = setInterval(next, 4000);
-  };
-
-  const w = weddings[current];
+  const currentWedding = weddings[currentIndex];
 
   return (
-    <div style={{
-      display: "flex", flexDirection: "column", minHeight: "100vh",
-      background: "#3B010B", fontFamily: "'DM Sans', sans-serif"
-    }}>
-
-      {/* Header */}
-      <div style={{ padding: "32px 24px 16px", textAlign: "center" }}>
-        <p style={{
-          color: "#E77291", fontSize: 11, letterSpacing: 4,
-          fontWeight: 600, marginBottom: 8
-        }}>REAL WEDDINGS BY</p>
-        <h1 style={{
-          fontFamily: "'DM Serif Display', serif",
-          fontStyle: "italic", color: "#FFFFFF",
-          fontSize: 36, letterSpacing: 1
-        }}>Vivaha</h1>
-        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, marginTop: 6 }}>
-          Real couples. Real stories. Real magic.
-        </p>
+    <div style={styles.container}>
+      {/* Header - Simple with only Hindi logo */}
+      <div style={styles.header}>
+        <div style={styles.headerContent}>
+          <div style={styles.headerPlaceholder} />
+          <HindiLogo size="medium" />
+          <div style={styles.headerPlaceholder} />
+        </div>
       </div>
 
-      {/* Main Carousel */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "16px" }}>
+      {/* Main Content */}
+      <div style={styles.mainContent}>
+        <div style={styles.heroSection}>
+          <h1 style={styles.title}>Real Weddings</h1>
+          <p style={styles.subtitle}>Real couples. Real stories. Real magic.</p>
+          <div style={styles.titleUnderline} />
+        </div>
 
-        {/* Image Card */}
-        <div
-          onMouseEnter={pauseAutoplay}
-          onMouseLeave={resumeAutoplay}
-          style={{
-            position: "relative", borderRadius: 28, overflow: "hidden",
-            flex: 1, minHeight: 380,
-            opacity: isTransitioning ? 0 : 1,
-            transform: isTransitioning ? "scale(0.97)" : "scale(1)",
-            transition: "opacity 0.3s ease, transform 0.3s ease",
-            boxShadow: "0 20px 60px rgba(0,0,0,0.5)"
-          }}
-        >
-          {/* Background Image */}
-          <img
-            src={w.image}
-            alt={w.couple}
-            style={{
-              width: "100%", height: "100%",
-              objectFit: "cover", position: "absolute", inset: 0
-            }}
-          />
-
-          {/* Gradient Overlay */}
-          <div style={{
-            position: "absolute", inset: 0,
-            background: "linear-gradient(to top, rgba(59,1,11,0.95) 0%, rgba(59,1,11,0.4) 50%, transparent 100%)"
-          }} />
-
-          {/* Left / Right arrows */}
-          <button onClick={prev} style={{
-            position: "absolute", left: 16, top: "50%",
-            transform: "translateY(-50%)",
-            background: "rgba(255,255,255,0.15)",
-            border: "1px solid rgba(255,255,255,0.2)",
-            color: "white", borderRadius: "50%",
-            width: 40, height: 40, cursor: "pointer",
-            fontSize: 18, display: "flex",
-            alignItems: "center", justifyContent: "center",
-            backdropFilter: "blur(4px)"
-          }}>‹</button>
-
-          <button onClick={next} style={{
-            position: "absolute", right: 16, top: "50%",
-            transform: "translateY(-50%)",
-            background: "rgba(255,255,255,0.15)",
-            border: "1px solid rgba(255,255,255,0.2)",
-            color: "white", borderRadius: "50%",
-            width: 40, height: 40, cursor: "pointer",
-            fontSize: 18, display: "flex",
-            alignItems: "center", justifyContent: "center",
-            backdropFilter: "blur(4px)"
-          }}>›</button>
-
-          {/* Bottom Content */}
-          <div style={{
-            position: "absolute", bottom: 0, left: 0, right: 0,
-            padding: "24px 24px 28px"
-          }}>
-            {/* Type Badge */}
-            <span style={{
-              background: "rgba(231,114,145,0.25)",
-              border: "1px solid #E77291",
-              color: "#E77291", borderRadius: 999,
-              padding: "4px 14px", fontSize: 11,
-              fontWeight: 600, letterSpacing: 1,
-              display: "inline-block", marginBottom: 10
-            }}>{w.type}</span>
-
-            {/* Couple Name — hoverable */}
-            <div
-              onMouseEnter={() => setHoveredCouple(w.id)}
-              onMouseLeave={() => setHoveredCouple(null)}
-              style={{ cursor: "default" }}
-            >
-              <h2 style={{
-                fontFamily: "'DM Serif Display', serif",
-                fontStyle: "italic", color: "#FFFFFF",
-                fontSize: 32, lineHeight: 1.1, marginBottom: 6,
-                borderBottom: hoveredCouple === w.id
-                  ? "1px solid rgba(231,114,145,0.5)" : "1px solid transparent",
-                display: "inline-block", paddingBottom: 2,
-                transition: "border 0.2s"
-              }}>{w.couple}</h2>
+        {/* Featured Wedding Carousel */}
+        <div style={styles.carouselContainer}>
+          <div style={styles.carousel}>
+            <img src={currentWedding.image} alt={currentWedding.couple} style={styles.carouselImage} />
+            <div style={styles.carouselOverlay}>
+              <span style={styles.weddingType}>{currentWedding.type}</span>
+              <h2 style={styles.coupleName}>{currentWedding.couple}</h2>
+              <div style={styles.weddingMeta}>
+                <span><Calendar size={14} /> {currentWedding.date}</span>
+                <span><MapPin size={14} /> {currentWedding.location}</span>
+              </div>
+              <button 
+                style={styles.readStoryBtn}
+                onClick={() => setSelectedWedding(currentWedding)}
+              >
+                Read Their Story <ArrowRight size={16} />
+              </button>
             </div>
-
-            <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 13 }}>
-              {w.date} · {w.city}
-            </p>
+          </div>
+          
+          <div style={styles.carouselControls}>
+            <button onClick={() => setIsPlaying(!isPlaying)} style={styles.playBtn}>
+              {isPlaying ? <Pause size={20} /> : <Play size={20} />}
+            </button>
+            <div style={styles.dots}>
+              {weddings.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => { setCurrentIndex(idx); setIsPlaying(false); }}
+                  style={{
+                    ...styles.dot,
+                    background: currentIndex === idx ? "#AC1634" : "#F5D0DA"
+                  }}
+                />
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Hover Story Card */}
-        <div style={{
-          background: hoveredCouple ? "rgba(255,255,255,0.06)" : "transparent",
-          border: hoveredCouple ? "1px solid rgba(231,114,145,0.2)" : "1px solid transparent",
-          borderRadius: 20, padding: hoveredCouple ? "18px 20px" : "0px 20px",
-          marginTop: 12,
-          maxHeight: hoveredCouple ? 200 : 0,
-          overflow: "hidden",
-          opacity: hoveredCouple ? 1 : 0,
-          transition: "all 0.4s ease",
-          backdropFilter: "blur(10px)"
-        }}>
-          <p style={{
-            color: "#E77291", fontSize: 11,
-            letterSpacing: 2, fontWeight: 600, marginBottom: 8
-          }}>THEIR STORY</p>
-          <p style={{
-            color: "rgba(255,255,255,0.8)", fontSize: 14,
-            lineHeight: 1.8, fontWeight: 300
-          }}>{w.story}</p>
+        {/* Wedding Grid */}
+        <div style={styles.section}>
+          <h2 style={styles.sectionTitle}>More Wedding Stories</h2>
+          <div style={styles.weddingsGrid}>
+            {weddings.map((wedding) => (
+              <div key={wedding.id} style={styles.weddingCard}>
+                <img src={wedding.image} alt={wedding.couple} style={styles.weddingImage} />
+                <div style={styles.weddingCardContent}>
+                  <span style={styles.cardType}>{wedding.type}</span>
+                  <h3 style={styles.cardCouple}>{wedding.couple}</h3>
+                  <div style={styles.cardMeta}>
+                    <span><Calendar size={12} /> {wedding.date}</span>
+                    <span><MapPin size={12} /> {wedding.location}</span>
+                  </div>
+                  <button 
+                    style={styles.viewStoryBtn}
+                    onClick={() => setSelectedWedding(wedding)}
+                  >
+                    View Story
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Dot indicators + thumbnails */}
-        <div style={{
-          display: "flex", justifyContent: "center",
-          gap: 16, marginTop: 20, alignItems: "center"
-        }}>
-          {weddings.map((wed, i) => (
-            <div
-              key={wed.id}
-              onClick={() => goTo(i)}
-              style={{
-                cursor: "pointer", transition: "all 0.3s ease",
-                opacity: i === current ? 1 : 0.4,
-                transform: i === current ? "scale(1.1)" : "scale(1)"
-              }}
-            >
-              <img
-                src={wed.image}
-                alt={wed.couple}
-                style={{
-                  width: i === current ? 52 : 40,
-                  height: i === current ? 52 : 40,
-                  borderRadius: "50%", objectFit: "cover",
-                  border: i === current
-                    ? "2px solid #E77291" : "2px solid rgba(255,255,255,0.2)",
-                  transition: "all 0.3s ease"
-                }}
-              />
-            </div>
-          ))}
+        {/* CTA Section - Leads to Role Selection */}
+        <div style={styles.ctaSection}>
+          <Sparkles size={32} color="#E77291" />
+          <h3 style={styles.ctaTitle}>Start Planning Your Dream Wedding</h3>
+          <p style={styles.ctaText}>Join 10,000+ couples who planned their perfect day with Vivaha</p>
+          <button onClick={() => navigate("/role")} style={styles.ctaBtn}>
+            Start Planning Your Wedding → <ArrowRight size={16} />
+          </button>
         </div>
-
-        {/* CTA Button */}
-        <button
-          onClick={() => navigate("/role")}
-          style={{
-            width: "100%", marginTop: 24, padding: "16px",
-            background: "linear-gradient(135deg, #AC1634, #3E0014)",
-            color: "white", border: "none", borderRadius: 999,
-            fontSize: 15, fontWeight: 600, cursor: "pointer",
-            fontFamily: "'DM Sans', sans-serif",
-            boxShadow: "0 8px 24px rgba(172,22,52,0.4)",
-            letterSpacing: 0.5
-          }}>
-          Start Planning Your Wedding →
-        </button>
-
-        <p style={{
-          textAlign: "center", marginTop: 14,
-          color: "rgba(255,255,255,0.35)", fontSize: 12
-        }}>
-          Join 10,000+ couples who planned with Vivaha
-        </p>
       </div>
+
+      {/* Story Modal */}
+      {selectedWedding && (
+        <div style={styles.modalOverlay} onClick={() => setSelectedWedding(null)}>
+          <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setSelectedWedding(null)} style={styles.modalClose}>✕</button>
+            <img src={selectedWedding.image} alt={selectedWedding.couple} style={styles.modalImage} />
+            <div style={styles.modalContent}>
+              <h2 style={styles.modalTitle}>{selectedWedding.couple}</h2>
+              <div style={styles.modalMeta}>
+                <span><Calendar size={14} /> {selectedWedding.date}</span>
+                <span><MapPin size={14} /> {selectedWedding.location}</span>
+                <span><Users size={14} /> {selectedWedding.guests} guests</span>
+                <span><Heart size={14} /> {selectedWedding.budget}</span>
+              </div>
+              <p style={styles.modalStory}>{selectedWedding.story}</p>
+              <div style={styles.modalVendors}>
+                <p style={styles.vendorsTitle}>Vendors they chose:</p>
+                <div style={styles.vendorTags}>
+                  {selectedWedding.vendors.map(v => (
+                    <span key={v} style={styles.vendorTag}>{v}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+const styles = {
+  container: {
+    minHeight: "100vh",
+    background: "#FDF0F3",
+    fontFamily: "'DM Sans', sans-serif"
+  },
+  header: {
+    background: "#3E0014",
+    position: "sticky",
+    top: 0,
+    zIndex: 100
+  },
+  headerContent: {
+    maxWidth: "1280px",
+    margin: "0 auto",
+    padding: "20px 32px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center"
+  },
+  headerPlaceholder: {
+    width: "70px"
+  },
+  mainContent: {
+    maxWidth: "1280px",
+    margin: "0 auto",
+    padding: "48px 32px",
+    paddingBottom: "80px"
+  },
+  heroSection: {
+    textAlign: "center",
+    marginBottom: "48px"
+  },
+  title: {
+    fontFamily: "'DM Serif Display', serif",
+    fontSize: "48px",
+    color: "#3E0014",
+    marginBottom: "12px"
+  },
+  subtitle: {
+    fontSize: "18px",
+    color: "#7A5560"
+  },
+  titleUnderline: {
+    width: "80px",
+    height: "3px",
+    background: "#AC1634",
+    margin: "20px auto 0"
+  },
+  carouselContainer: {
+    marginBottom: "64px"
+  },
+  carousel: {
+    position: "relative",
+    borderRadius: "32px",
+    overflow: "hidden",
+    height: "500px"
+  },
+  carouselImage: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover"
+  },
+  carouselOverlay: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    background: "linear-gradient(to top, rgba(62,0,20,0.9), transparent)",
+    padding: "48px 40px",
+    color: "white"
+  },
+  weddingType: {
+    display: "inline-block",
+    background: "rgba(231,114,145,0.2)",
+    padding: "4px 12px",
+    borderRadius: "999px",
+    fontSize: "12px",
+    marginBottom: "16px"
+  },
+  coupleName: {
+    fontFamily: "'DM Serif Display', serif",
+    fontSize: "36px",
+    marginBottom: "12px"
+  },
+  weddingMeta: {
+    display: "flex",
+    gap: "20px",
+    marginBottom: "20px",
+    fontSize: "14px",
+    opacity: 0.8
+  },
+  readStoryBtn: {
+    background: "#E77291",
+    border: "none",
+    padding: "10px 24px",
+    borderRadius: "999px",
+    color: "#3E0014",
+    fontWeight: 600,
+    cursor: "pointer",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "8px"
+  },
+  carouselControls: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "20px",
+    marginTop: "20px"
+  },
+  playBtn: {
+    background: "white",
+    border: "1px solid #F5D0DA",
+    borderRadius: "50%",
+    width: "40px",
+    height: "40px",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  dots: {
+    display: "flex",
+    gap: "8px"
+  },
+  dot: {
+    width: "8px",
+    height: "8px",
+    borderRadius: "50%",
+    border: "none",
+    cursor: "pointer",
+    transition: "all 0.3s"
+  },
+  section: {
+    marginBottom: "64px"
+  },
+  sectionTitle: {
+    fontFamily: "'DM Serif Display', serif",
+    fontSize: "28px",
+    color: "#3E0014",
+    marginBottom: "24px"
+  },
+  weddingsGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))",
+    gap: "32px"
+  },
+  weddingCard: {
+    background: "white",
+    borderRadius: "24px",
+    overflow: "hidden",
+    border: "1px solid #F5D0DA",
+    transition: "transform 0.3s"
+  },
+  weddingImage: {
+    width: "100%",
+    height: "250px",
+    objectFit: "cover"
+  },
+  weddingCardContent: {
+    padding: "20px"
+  },
+  cardType: {
+    display: "inline-block",
+    background: "#FDF0F3",
+    padding: "4px 12px",
+    borderRadius: "999px",
+    fontSize: "11px",
+    color: "#AC1634",
+    marginBottom: "12px"
+  },
+  cardCouple: {
+    fontSize: "20px",
+    fontWeight: 600,
+    color: "#3E0014",
+    marginBottom: "8px"
+  },
+  cardMeta: {
+    display: "flex",
+    gap: "16px",
+    fontSize: "12px",
+    color: "#999",
+    marginBottom: "16px"
+  },
+  viewStoryBtn: {
+    background: "none",
+    border: "1px solid #F5D0DA",
+    padding: "8px 16px",
+    borderRadius: "999px",
+    cursor: "pointer",
+    fontSize: "13px",
+    width: "100%"
+  },
+  ctaSection: {
+    textAlign: "center",
+    background: "linear-gradient(135deg, #3E0014, #7A002B)",
+    borderRadius: "32px",
+    padding: "48px",
+    color: "white"
+  },
+  ctaTitle: {
+    fontFamily: "'DM Serif Display', serif",
+    fontSize: "28px",
+    marginTop: "16px",
+    marginBottom: "12px"
+  },
+  ctaText: {
+    fontSize: "14px",
+    opacity: 0.8,
+    marginBottom: "24px"
+  },
+  ctaBtn: {
+    background: "#E77291",
+    border: "none",
+    padding: "14px 32px",
+    borderRadius: "999px",
+    color: "#3E0014",
+    fontWeight: 600,
+    cursor: "pointer",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "8px"
+  },
+  modalOverlay: {
+    position: "fixed",
+    inset: 0,
+    background: "rgba(62,0,20,0.9)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 1000
+  },
+  modal: {
+    background: "white",
+    borderRadius: "32px",
+    width: "90%",
+    maxWidth: "600px",
+    maxHeight: "80vh",
+    overflow: "auto",
+    position: "relative"
+  },
+  modalClose: {
+    position: "absolute",
+    top: "16px",
+    right: "16px",
+    background: "white",
+    border: "none",
+    borderRadius: "50%",
+    width: "36px",
+    height: "36px",
+    cursor: "pointer",
+    fontSize: "18px",
+    zIndex: 10
+  },
+  modalImage: {
+    width: "100%",
+    height: "300px",
+    objectFit: "cover"
+  },
+  modalContent: {
+    padding: "24px"
+  },
+  modalTitle: {
+    fontSize: "24px",
+    fontWeight: 700,
+    color: "#3E0014",
+    marginBottom: "16px"
+  },
+  modalMeta: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "16px",
+    fontSize: "13px",
+    color: "#666",
+    marginBottom: "20px"
+  },
+  modalStory: {
+    fontSize: "15px",
+    lineHeight: 1.6,
+    color: "#444",
+    marginBottom: "20px"
+  },
+  modalVendors: {
+    paddingTop: "16px",
+    borderTop: "1px solid #F5D0DA"
+  },
+  vendorsTitle: {
+    fontSize: "13px",
+    fontWeight: 600,
+    marginBottom: "12px"
+  },
+  vendorTags: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "8px"
+  },
+  vendorTag: {
+    background: "#FDF0F3",
+    padding: "4px 12px",
+    borderRadius: "999px",
+    fontSize: "12px"
+  }
+};
