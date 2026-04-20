@@ -8,9 +8,253 @@ import {
   BarChart3, Phone, Mail, MapPin, Menu, X,
   Plus, Edit2, Save, ChevronRight, Sparkles, Shield,
   Video, LogOut, LayoutDashboard, ClipboardList, Calendar as CalendarIcon,
-  Briefcase, FolderOpen, Users as UsersIcon, BarChart
+  Briefcase, FolderOpen, Users as UsersIcon, BarChart, Leaf
 } from "lucide-react";
 import HindiLogo from "../components/HindiLogo";
+import BottomNav from "../components/BottomNav";
+
+// Green Score Card Component
+const GreenScoreCard = ({ vendorProfile, setVendorProfile }) => {
+  const [showTips, setShowTips] = useState(false);
+  
+  // Calculate green score based on vendor practices
+  const calculateGreenScore = () => {
+    let score = vendorProfile.greenScore || 0;
+    if (vendorProfile.ecoFriendly) score += 30;
+    if (vendorProfile.zeroWaste) score += 25;
+    if (vendorProfile.localSourcing) score += 20;
+    if (vendorProfile.recyclableMaterials) score += 15;
+    if (vendorProfile.energyEfficient) score += 10;
+    return Math.min(score, 100);
+  };
+
+  const greenScore = calculateGreenScore();
+  
+  // Tips from client reviews to improve green score
+  const greenTips = [
+    { id: 1, tip: "Use LED lighting instead of traditional lights", impact: "+15 points", from: "Client Review" },
+    { id: 2, tip: "Source flowers locally to reduce carbon footprint", impact: "+20 points", from: "Multiple Reviews" },
+    { id: 3, tip: "Offer digital invoices and contracts", impact: "+10 points", from: "Eco-conscious couples" },
+    { id: 4, tip: "Use reusable decor items instead of single-use", impact: "+25 points", from: "Client Suggestion" },
+    { id: 5, tip: "Compost event waste after setup", impact: "+15 points", from: "Sustainability Expert" },
+    { id: 6, tip: "Partner with other green vendors", impact: "+10 points", from: "Industry Best Practice" },
+    { id: 7, tip: "Switch to renewable energy for your studio", impact: "+20 points", from: "Green Initiative" },
+    { id: 8, tip: "Offer paperless billing and receipts", impact: "+10 points", from: "Client Request" }
+  ];
+
+  const getScoreColor = () => {
+    if (greenScore >= 80) return "#4CAF50";
+    if (greenScore >= 60) return "#8BC34A";
+    if (greenScore >= 40) return "#FFC107";
+    return "#FF9800";
+  };
+
+  const getScoreLabel = () => {
+    if (greenScore >= 80) return "Eco-Champion 🌟";
+    if (greenScore >= 60) return "Green Leader 🌿";
+    if (greenScore >= 40) return "Eco-Aware 💚";
+    return "Getting Started 🌱";
+  };
+
+  return (
+    <div style={greenScoreStyles.container}>
+      <div style={greenScoreStyles.header}>
+        <Leaf size={24} color="#2d6a4f" />
+        <h3 style={greenScoreStyles.title}>Green Wedding Score</h3>
+        <button 
+          style={greenScoreStyles.infoBtn}
+          onClick={() => setShowTips(!showTips)}
+        >
+          {showTips ? "Hide Tips ↑" : "View Tips ↓"}
+        </button>
+      </div>
+      
+      <div style={greenScoreStyles.scoreContainer}>
+        <div style={greenScoreStyles.scoreCircle}>
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="54" fill="none" stroke="#E8F5E9" strokeWidth="8"/>
+            <circle 
+              cx="60" cy="60" r="54" fill="none" 
+              stroke={getScoreColor()} strokeWidth="8"
+              strokeDasharray={`${(greenScore / 100) * 339.3} 339.3`}
+              strokeLinecap="round"
+              transform="rotate(-90 60 60)"
+              style={{ transition: "stroke-dasharray 1s ease" }}
+            />
+            <text x="60" y="55" textAnchor="middle" fontSize="24" fontWeight="bold" fill="#3E0014">{greenScore}</text>
+            <text x="60" y="75" textAnchor="middle" fontSize="10" fill="#666">points</text>
+          </svg>
+        </div>
+        <div style={greenScoreStyles.scoreInfo}>
+          <p style={greenScoreStyles.scoreLabel}>{getScoreLabel()}</p>
+          <p style={greenScoreStyles.scoreText}>
+            {greenScore >= 80 ? "Excellent! You're a sustainability leader! 🎉" :
+             greenScore >= 60 ? "Great! You're on the right track! Keep going!" :
+             greenScore >= 40 ? "Good start! Small changes make big impact!" :
+             "Start your green journey today! Every step counts."}
+          </p>
+          <div style={greenScoreStyles.badges}>
+            {greenScore >= 80 && <span style={greenScoreStyles.badge}>🌿 Eco-Champion</span>}
+            {greenScore >= 60 && <span style={greenScoreStyles.badge}>♻️ Zero Waste</span>}
+            {greenScore >= 40 && <span style={greenScoreStyles.badge}>🌱 Eco-Aware</span>}
+            {vendorProfile.localSourcing && <span style={greenScoreStyles.badge}>📍 Local Sourcing</span>}
+            {vendorProfile.ecoFriendly && <span style={greenScoreStyles.badge}>💚 Eco-Friendly</span>}
+          </div>
+        </div>
+      </div>
+
+      {showTips && (
+        <div style={greenScoreStyles.tipsContainer}>
+          <h4 style={greenScoreStyles.tipsTitle}>📈 Ways to Improve Your Green Score</h4>
+          <p style={greenScoreStyles.tipsSubtitle}>Based on client feedback and industry standards</p>
+          {greenTips.map(tip => (
+            <div key={tip.id} style={greenScoreStyles.tipCard}>
+              <div style={greenScoreStyles.tipIcon}>💡</div>
+              <div style={greenScoreStyles.tipContent}>
+                <p style={greenScoreStyles.tipText}>{tip.tip}</p>
+                <div style={greenScoreStyles.tipMeta}>
+                  <span style={greenScoreStyles.tipImpact}>{tip.impact}</span>
+                  <span style={greenScoreStyles.tipFrom}>📝 {tip.from}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+          <button style={greenScoreStyles.improveBtn}>
+            Get Personalized Green Audit →
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const greenScoreStyles = {
+  container: {
+    background: "white",
+    borderRadius: "20px",
+    padding: "24px",
+    marginBottom: "24px",
+    border: "1px solid #F5D0DA"
+  },
+  header: {
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    marginBottom: "20px",
+    flexWrap: "wrap"
+  },
+  title: {
+    fontSize: "18px",
+    fontWeight: 600,
+    color: "#3E0014",
+    margin: 0,
+    flex: 1
+  },
+  infoBtn: {
+    background: "#FDF0F3",
+    border: "1px solid #F5D0DA",
+    padding: "6px 16px",
+    borderRadius: "999px",
+    cursor: "pointer",
+    fontSize: "12px",
+    color: "#AC1634"
+  },
+  scoreContainer: {
+    display: "flex",
+    gap: "24px",
+    alignItems: "center",
+    flexWrap: "wrap",
+    marginBottom: "16px"
+  },
+  scoreCircle: {
+    position: "relative"
+  },
+  scoreInfo: {
+    flex: 1
+  },
+  scoreLabel: {
+    fontSize: "20px",
+    fontWeight: "bold",
+    color: "#2d6a4f",
+    marginBottom: "8px"
+  },
+  scoreText: {
+    fontSize: "13px",
+    color: "#666",
+    marginBottom: "12px"
+  },
+  badges: {
+    display: "flex",
+    gap: "8px",
+    flexWrap: "wrap"
+  },
+  badge: {
+    background: "#E8F5E9",
+    color: "#2d6a4f",
+    padding: "4px 12px",
+    borderRadius: "999px",
+    fontSize: "11px",
+    fontWeight: 600
+  },
+  tipsContainer: {
+    marginTop: "20px",
+    paddingTop: "20px",
+    borderTop: "1px solid #F5D0DA"
+  },
+  tipsTitle: {
+    fontSize: "16px",
+    fontWeight: 600,
+    marginBottom: "4px"
+  },
+  tipsSubtitle: {
+    fontSize: "12px",
+    color: "#666",
+    marginBottom: "16px"
+  },
+  tipCard: {
+    display: "flex",
+    gap: "12px",
+    padding: "12px",
+    background: "#FDF0F3",
+    borderRadius: "12px",
+    marginBottom: "10px"
+  },
+  tipIcon: {
+    fontSize: "20px"
+  },
+  tipContent: {
+    flex: 1
+  },
+  tipText: {
+    fontSize: "13px",
+    fontWeight: 500,
+    marginBottom: "6px"
+  },
+  tipMeta: {
+    display: "flex",
+    gap: "16px",
+    fontSize: "11px",
+    flexWrap: "wrap"
+  },
+  tipImpact: {
+    color: "#4CAF50",
+    fontWeight: 600
+  },
+  tipFrom: {
+    color: "#999"
+  },
+  improveBtn: {
+    width: "100%",
+    marginTop: "16px",
+    padding: "12px",
+    borderRadius: "999px",
+    background: "#2d6a4f",
+    color: "white",
+    border: "none",
+    cursor: "pointer",
+    fontWeight: 600
+  }
+};
 
 export default function VendorDashboard({ user, setUser }) {
   const navigate = useNavigate();
@@ -23,7 +267,7 @@ export default function VendorDashboard({ user, setUser }) {
   const [showPowerPairModal, setShowPowerPairModal] = useState(false);
   const [editingProfile, setEditingProfile] = useState(false);
   
-  // Vendor Data
+  // Vendor Data with Green Metrics
   const [vendorProfile, setVendorProfile] = useState({
     businessName: "Lens & Love Studio",
     ownerName: "Rajesh Mehta",
@@ -32,7 +276,7 @@ export default function VendorDashboard({ user, setUser }) {
     category: "Photography",
     experience: "10+ years",
     location: "Mumbai, Delhi, Jaipur",
-    bio: "Award-winning wedding photographers capturing candid moments with artistic vision.",
+    bio: "Award-winning wedding photographers capturing candid moments with artistic vision. Specializing in cinematic storytelling and natural light photography.",
     rating: 4.9,
     totalReviews: 234,
     totalBookings: 156,
@@ -40,7 +284,14 @@ export default function VendorDashboard({ user, setUser }) {
     responseTime: "< 1 hour",
     priceRange: "₹85,000 - ₹2,50,000",
     verified: true,
-    premium: true
+    premium: true,
+    // Green Metrics
+    greenScore: 65,
+    ecoFriendly: true,
+    zeroWaste: true,
+    localSourcing: true,
+    recyclableMaterials: false,
+    energyEfficient: false
   });
 
   // Booking Requests
@@ -131,19 +382,9 @@ export default function VendorDashboard({ user, setUser }) {
   const [aiInsights, setAiInsights] = useState([
     "Your response rate of 98% is excellent! Top 5% of vendors.",
     "Photos with natural lighting get 40% more inquiries.",
-    "Consider adding a video portfolio to increase conversions by 25%."
+    "Consider adding a video portfolio to increase conversions by 25%.",
+    "Your green score of 65 is good! Implementing sustainable practices can attract eco-conscious couples."
   ]);
-
-  // Navigation items for sidebar
-  const navItems = [
-    { id: "overview", label: "Dashboard Overview", icon: <LayoutDashboard size={20} /> },
-    { id: "requests", label: "Booking Requests", icon: <MessageCircle size={20} />, badge: bookingRequests.length },
-    { id: "bookings", label: "Upcoming Bookings", icon: <CalendarIcon size={20} /> },
-    { id: "analytics", label: "Analytics", icon: <BarChart size={20} /> },
-    { id: "portfolio", label: "Portfolio", icon: <Camera size={20} /> },
-    { id: "powerpairs", label: "Power Pairs", icon: <UsersIcon size={20} /> },
-    { id: "profile", label: "Business Profile", icon: <Briefcase size={20} /> }
-  ];
 
   const handleAcceptRequest = (request) => {
     setSelectedRequest(request);
@@ -175,6 +416,22 @@ export default function VendorDashboard({ user, setUser }) {
     setPowerPairs([...powerPairs, { ...pair, status: "active" }]);
     setSuggestedPowerPairs(suggestedPowerPairs.filter(p => p.id !== pair.id));
   };
+
+  const addPortfolioImage = (imageUrl) => {
+    if (imageUrl) {
+      setPortfolio([...portfolio, imageUrl]);
+    }
+  };
+
+  const navItems = [
+    { id: "overview", label: "Dashboard Overview", icon: <LayoutDashboard size={20} /> },
+    { id: "requests", label: "Booking Requests", icon: <MessageCircle size={20} />, badge: bookingRequests.length },
+    { id: "bookings", label: "Upcoming Bookings", icon: <CalendarIcon size={20} /> },
+    { id: "analytics", label: "Analytics", icon: <BarChart size={20} /> },
+    { id: "portfolio", label: "Portfolio", icon: <Camera size={20} /> },
+    { id: "powerpairs", label: "Power Pairs", icon: <UsersIcon size={20} /> },
+    { id: "profile", label: "Business Profile", icon: <Briefcase size={20} /> }
+  ];
 
   return (
     <div style={styles.container}>
@@ -294,11 +551,15 @@ export default function VendorDashboard({ user, setUser }) {
           </div>
         </div>
 
-        {/* Active Tab Content */}
+        {/* Tab Content */}
         <div style={styles.tabContent}>
           {/* Overview Tab */}
           {activeTab === "overview" && (
             <div>
+              {/* Green Score Card */}
+              <GreenScoreCard vendorProfile={vendorProfile} setVendorProfile={setVendorProfile} />
+
+              {/* AI Performance Insights */}
               <div style={styles.aiSection}>
                 <div style={styles.aiHeader}><Sparkles size={20} color="#E77291" /> AI Performance Insights</div>
                 <div style={styles.aiGrid}>
@@ -308,6 +569,7 @@ export default function VendorDashboard({ user, setUser }) {
                 </div>
               </div>
 
+              {/* Quick Actions */}
               <div style={styles.quickActions}>
                 <h3 style={styles.sectionTitle}>Quick Actions</h3>
                 <div style={styles.actionGrid}>
@@ -318,6 +580,7 @@ export default function VendorDashboard({ user, setUser }) {
                 </div>
               </div>
 
+              {/* Recent Activity */}
               <div style={styles.recentSection}>
                 <h3 style={styles.sectionTitle}>Recent Activity</h3>
                 {bookingRequests.slice(0, 2).map(req => (
@@ -475,6 +738,16 @@ export default function VendorDashboard({ user, setUser }) {
                   <div><Mail size={16} /> {vendorProfile.email}</div>
                 </div>
                 {editingProfile ? <textarea style={styles.editTextarea} value={vendorProfile.bio} onChange={(e) => setVendorProfile({...vendorProfile, bio: e.target.value})} rows={3} /> : <p style={styles.profileBio}>{vendorProfile.bio}</p>}
+                <div style={styles.greenMetrics}>
+                  <h4>🌿 Sustainability Practices</h4>
+                  <div style={styles.metricsGrid}>
+                    <label><input type="checkbox" checked={vendorProfile.ecoFriendly} onChange={(e) => setVendorProfile({...vendorProfile, ecoFriendly: e.target.checked})} /> Eco-Friendly Products</label>
+                    <label><input type="checkbox" checked={vendorProfile.zeroWaste} onChange={(e) => setVendorProfile({...vendorProfile, zeroWaste: e.target.checked})} /> Zero Waste Policy</label>
+                    <label><input type="checkbox" checked={vendorProfile.localSourcing} onChange={(e) => setVendorProfile({...vendorProfile, localSourcing: e.target.checked})} /> Local Sourcing</label>
+                    <label><input type="checkbox" checked={vendorProfile.recyclableMaterials} onChange={(e) => setVendorProfile({...vendorProfile, recyclableMaterials: e.target.checked})} /> Recyclable Materials</label>
+                    <label><input type="checkbox" checked={vendorProfile.energyEfficient} onChange={(e) => setVendorProfile({...vendorProfile, energyEfficient: e.target.checked})} /> Energy Efficient</label>
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -504,8 +777,20 @@ export default function VendorDashboard({ user, setUser }) {
           <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div style={styles.modalHeader}><h3>Add to Portfolio</h3><button onClick={() => setShowPortfolioModal(false)}>✕</button></div>
             <div style={styles.modalContent}>
-              <input type="text" placeholder="Image URL" style={styles.modalInput} />
-              <div style={styles.modalActions}><button onClick={() => setShowPortfolioModal(false)}>Cancel</button><button>Upload</button></div>
+              <input 
+                type="text" 
+                placeholder="Image URL" 
+                style={styles.modalInput} 
+                id="portfolioImageUrl"
+              />
+              <div style={styles.modalActions}>
+                <button onClick={() => setShowPortfolioModal(false)}>Cancel</button>
+                <button onClick={() => {
+                  const url = document.getElementById("portfolioImageUrl").value;
+                  if (url) addPortfolioImage(url);
+                  setShowPortfolioModal(false);
+                }}>Upload</button>
+              </div>
             </div>
           </div>
         </div>
@@ -639,6 +924,8 @@ const styles = {
   profileBio: { fontSize: "14px", color: "#666", lineHeight: 1.6, marginBottom: "16px" },
   editInput: { padding: "8px", borderRadius: "8px", border: "1px solid #F5D0DA", fontSize: "14px", width: "100%", maxWidth: "300px" },
   editTextarea: { padding: "12px", borderRadius: "12px", border: "1px solid #F5D0DA", width: "100%", fontSize: "14px", marginBottom: "16px" },
+  greenMetrics: { marginTop: "20px", paddingTop: "16px", borderTop: "1px solid #F5D0DA" },
+  metricsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "12px", marginTop: "12px" },
   emptyState: { textAlign: "center", padding: "60px", color: "#999" },
   modalOverlay: { position: "fixed", inset: 0, background: "rgba(62,0,20,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 },
   modal: { background: "white", borderRadius: "24px", width: "90%", maxWidth: "500px", maxHeight: "80vh", overflow: "auto" },

@@ -23,6 +23,9 @@ import BudgetPlanner from "./pages/BudgetPlanner";
 import WellnessHub from "./pages/WellnessHub";
 import SustainabilityHub from "./pages/SustainabilityHub";
 import AdminLogin from "./pages/AdminLogin";
+import RasamRiwaz from "./pages/RasamRiwaz";
+import LegalDocs from "./pages/LegalDocs";
+import AIAssistantPage from "./pages/AIAssistantPage";
 
 function App() {
   const [user, setUser] = useState({ 
@@ -39,20 +42,20 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        // In App.jsx, make sure routes are in this order:
         <Route path="/" element={<SplashScreen />} />
-        <Route path="/intro" element={<IntroScreens />} />
         <Route path="/real-weddings" element={<RealWeddings />} />
-        <Route path="/role" element={<RoleSelection />} />
         <Route path="/login" element={<Login setUser={setUser} />} />
+        <Route path="/role" element={<RoleSelection user={user} setUser={setUser} />} />
         <Route path="/couple-form" element={<CoupleForm setUser={setUser} />} />
         <Route path="/onboarding/vendor" element={<VendorOnboarding setUser={setUser} />} />
         <Route path="/home" element={<CoupleDashboard user={user} setUser={setUser} />} />
+        <Route path="/vendor/dashboard" element={<VendorDashboard user={user} setUser={setUser} />} />
         <Route path="/checklist" element={<Checklist user={user} />} />
         <Route path="/inspiration" element={<InspirationBoard user={user} />} />
         <Route path="/package" element={<BuildPackage />} />
         <Route path="/profile" element={<CoupleProfile setUser={setUser} user={user} />} />
         <Route path="/messages" element={<Messaging />} />
-        <Route path="/vendor/dashboard" element={<VendorDashboard user={user} setUser={setUser} />} />
         <Route path="/admin-login" element={<AdminLogin setAdmin={setAdmin} />} />
         <Route path="/admin" element={<AdminDashboard admin={admin} setAdmin={setAdmin} />} />
         <Route path="/premium" element={<PremiumPage user={user} setUser={setUser} />} />
@@ -60,6 +63,9 @@ function App() {
         <Route path="/budget-planner" element={<BudgetPlanner />} />
         <Route path="/wellness" element={<WellnessHub />} />
         <Route path="/sustainability" element={<SustainabilityHub />} />
+        <Route path="/rasam-riwaz" element={<RasamRiwaz />} />
+        <Route path="/legal-docs" element={<LegalDocs />} />
+        <Route path="/ai-assistant" element={<AIAssistantPage user={user} />} />
       </Routes>
     </BrowserRouter>
   );

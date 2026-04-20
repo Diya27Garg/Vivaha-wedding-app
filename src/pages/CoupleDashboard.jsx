@@ -5,7 +5,7 @@ import {
   Menu, X, MessageCircle, Home, ClipboardList,
   Sparkles, Package, User, LogOut, Star,
   Copy, Check, Crown, Lock, Calendar, MapPin, Wallet,
-  Heart, Clock
+  Heart, Clock, Search, TrendingUp, ChevronRight, Tag, Gift
 } from "lucide-react";
 import HindiLogo from "../components/HindiLogo";
 import BottomNav from "../components/BottomNav";
@@ -16,38 +16,101 @@ const vendors = [
     id: 1, name: "Glam by Priya", service: "Makeup Artist",
     price: "₹45,000", rating: "5.0",
     image: "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=400&q=80",
-    tag: "Top Rated"
+    tag: "Top Rated", category: "makeup"
   },
   {
     id: 2, name: "Lens & Love Studio", service: "Photography",
     price: "₹85,000", rating: "4.9",
     image: "https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=400&q=80",
-    tag: "Most Booked"
+    tag: "Most Booked", category: "photography"
   },
   {
     id: 3, name: "Royal Blooms Decor", service: "Decoration",
     price: "₹1,20,000", rating: "4.8",
     image: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&q=80",
-    tag: "Premium"
+    tag: "Premium", category: "decor"
   },
   {
     id: 4, name: "Grand Feast Caterers", service: "Catering",
     price: "₹1,80,000", rating: "4.7",
     image: "https://images.unsplash.com/photo-1555244162-803834f70033?w=400&q=80",
-    tag: "New"
+    tag: "New", category: "catering"
   },
   {
     id: 5, name: "Beat Masters DJ", service: "Music & DJ",
     price: "₹60,000", rating: "4.6",
     image: "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=400&q=80",
-    tag: "Popular"
+    tag: "Popular", category: "music"
   },
   {
     id: 6, name: "Dream Venues", service: "Venue",
     price: "₹5,00,000", rating: "4.9",
     image: "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=400&q=80",
-    tag: "Luxury"
+    tag: "Luxury", category: "venue"
   },
+  {
+    id: 7, name: "Mehendi Artistry", service: "Mehendi Artist",
+    price: "₹35,000", rating: "4.8",
+    image: "https://images.unsplash.com/photo-1532712938311-25548b2e0a1b?w=400&q=80",
+    tag: "Trending", category: "mehendi"
+  },
+  {
+    id: 8, name: "Elegant Choreography", service: "Wedding Choreographer",
+    price: "₹50,000", rating: "4.7",
+    image: "https://images.unsplash.com/photo-1518834107812-67b0b7c58434?w=400&q=80",
+    tag: "Popular", category: "entertainment"
+  }
+];
+
+// Featured vendors for rotating display (Top performers this month)
+const featuredVendors = [
+  {
+    id: 1,
+    name: "Lens & Love Studio",
+    profession: "Wedding Photographer",
+    description: "Capturing candid moments with artistic vision. 450+ weddings done.",
+    image: "https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=400&q=80",
+    rating: 4.9,
+    bookings: 156
+  },
+  {
+    id: 2,
+    name: "Royal Blooms Decor",
+    profession: "Luxury Decorator",
+    description: "Creating magical wedding setups. 680+ weddings decorated.",
+    image: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&q=80",
+    rating: 4.8,
+    bookings: 234
+  },
+  {
+    id: 3,
+    name: "Glam by Priya",
+    profession: "Celebrity Makeup Artist",
+    description: "Making brides look like royalty. 890+ brides transformed.",
+    image: "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=400&q=80",
+    rating: 5.0,
+    bookings: 345
+  },
+  {
+    id: 4,
+    name: "Grand Feast Caterers",
+    profession: "Premium Catering",
+    description: "Exquisite multi-cuisine menus. 2500+ weddings catered.",
+    image: "https://images.unsplash.com/photo-1555244162-803834f70033?w=400&q=80",
+    rating: 4.7,
+    bookings: 567
+  }
+];
+
+const categories = [
+  { id: "all", label: "All", icon: "✨" },
+  { id: "photography", label: "Photography", icon: "📸" },
+  { id: "decor", label: "Decor", icon: "🎨" },
+  { id: "catering", label: "Catering", icon: "🍽️" },
+  { id: "makeup", label: "Makeup", icon: "💄" },
+  { id: "venue", label: "Venue", icon: "🏰" },
+  { id: "mehendi", label: "Mehendi", icon: "🎨" },
+  { id: "music", label: "Music", icon: "🎵" }
 ];
 
 const premiumBenefits = [
@@ -170,11 +233,435 @@ const countdownStyles = {
   tipMessage: { fontSize: "13px", color: "white", lineHeight: 1.4, margin: 0 }
 };
 
+// Featured Vendor Rotator Component
+const FeaturedVendorRotator = () => {
+  const navigate = useNavigate();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+
+  useEffect(() => {
+    if (!isHovered) {
+      const interval = setInterval(() => {
+        setCurrentIndex((prev) => (prev + 1) % featuredVendors.length);
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [isHovered]);
+
+  const currentVendor = featuredVendors[currentIndex];
+
+  return (
+    <div 
+      style={featuredStyles.container}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div style={featuredStyles.header}>
+        <TrendingUp size={20} color="#E77291" />
+        <h3 style={featuredStyles.title}>Featured This Month 🔥</h3>
+        <span style={featuredStyles.badge}>Top Performers</span>
+      </div>
+      
+      <div 
+        style={featuredStyles.card}
+        onClick={() => navigate("/package")}
+      >
+        <div style={featuredStyles.imageContainer}>
+          <img src={currentVendor.image} alt={currentVendor.name} style={featuredStyles.image} />
+          <div style={featuredStyles.ratingBadge}>⭐ {currentVendor.rating}</div>
+          <div style={featuredStyles.bookingsBadge}>📅 {currentVendor.bookings}+ bookings</div>
+        </div>
+        <div style={featuredStyles.info}>
+          <h4 style={featuredStyles.vendorName}>{currentVendor.name}</h4>
+          <p style={featuredStyles.profession}>{currentVendor.profession}</p>
+          <p style={featuredStyles.description}>{currentVendor.description}</p>
+          <button style={featuredStyles.viewBtn}>View Profile →</button>
+        </div>
+      </div>
+      
+      <div style={featuredStyles.dots}>
+        {featuredVendors.map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => setCurrentIndex(idx)}
+            style={{
+              ...featuredStyles.dot,
+              background: currentIndex === idx ? "#AC1634" : "#F5D0DA"
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const featuredStyles = {
+  container: {
+    background: "linear-gradient(135deg, #FFF5F7, white)",
+    borderRadius: "24px",
+    padding: "20px",
+    marginBottom: "24px",
+    border: "1px solid #F5D0DA"
+  },
+  header: {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    marginBottom: "16px",
+    flexWrap: "wrap"
+  },
+  title: {
+    fontFamily: "'DM Serif Display', serif",
+    fontSize: "20px",
+    color: "#3E0014",
+    margin: 0
+  },
+  badge: {
+    background: "#AC1634",
+    color: "white",
+    fontSize: "10px",
+    padding: "4px 12px",
+    borderRadius: "999px"
+  },
+  card: {
+    display: "flex",
+    gap: "20px",
+    cursor: "pointer",
+    transition: "transform 0.2s",
+    flexWrap: "wrap"
+  },
+  imageContainer: {
+    position: "relative",
+    flex: "0 0 180px"
+  },
+  image: {
+    width: "100%",
+    height: "180px",
+    borderRadius: "16px",
+    objectFit: "cover"
+  },
+  ratingBadge: {
+    position: "absolute",
+    top: "8px",
+    left: "8px",
+    background: "rgba(0,0,0,0.7)",
+    color: "#FFD700",
+    padding: "4px 8px",
+    borderRadius: "8px",
+    fontSize: "11px"
+  },
+  bookingsBadge: {
+    position: "absolute",
+    bottom: "8px",
+    left: "8px",
+    background: "rgba(0,0,0,0.7)",
+    color: "white",
+    padding: "4px 8px",
+    borderRadius: "8px",
+    fontSize: "10px"
+  },
+  info: {
+    flex: 1
+  },
+  vendorName: {
+    fontSize: "18px",
+    fontWeight: 700,
+    color: "#3E0014",
+    marginBottom: "4px"
+  },
+  profession: {
+    fontSize: "13px",
+    color: "#E77291",
+    marginBottom: "8px"
+  },
+  description: {
+    fontSize: "13px",
+    color: "#666",
+    lineHeight: 1.5,
+    marginBottom: "12px"
+  },
+  viewBtn: {
+    background: "#3E0014",
+    color: "white",
+    border: "none",
+    padding: "8px 20px",
+    borderRadius: "999px",
+    cursor: "pointer",
+    fontSize: "12px"
+  },
+  dots: {
+    display: "flex",
+    justifyContent: "center",
+    gap: "8px",
+    marginTop: "16px"
+  },
+  dot: {
+    width: "8px",
+    height: "8px",
+    borderRadius: "50%",
+    border: "none",
+    cursor: "pointer",
+    transition: "all 0.2s"
+  }
+};
+
+// Live Offer Banner Component
+const LiveOfferBanner = () => {
+  const navigate = useNavigate();
+  
+  return (
+    <div style={offerStyles.container}>
+      <div style={offerStyles.content}>
+        <div style={offerStyles.iconContainer}>
+          <Gift size={24} color="#E77291" />
+          <Tag size={20} color="#E77291" style={{ marginLeft: "-8px" }} />
+        </div>
+        <div style={offerStyles.textContainer}>
+          <h4 style={offerStyles.title}>🎉 Bundle & Save Big! 🎉</h4>
+          <p style={offerStyles.description}>
+            Book <strong>3 or more vendors</strong> from Vivaha and get <strong>15% OFF</strong> on your total booking!
+          </p>
+          <p style={offerStyles.smallText}>✨ Plus free wedding coordination consultation ✨</p>
+        </div>
+        <button onClick={() => navigate("/package")} style={offerStyles.claimBtn}>
+          Claim Offer <ChevronRight size={16} />
+        </button>
+      </div>
+      <div style={offerStyles.countdown}>
+        <span>⏰ Offer ends in: 5d 12h</span>
+      </div>
+    </div>
+  );
+};
+
+const offerStyles = {
+  container: {
+    background: "linear-gradient(135deg, #3E0014, #7A002B)",
+    borderRadius: "20px",
+    marginBottom: "24px",
+    overflow: "hidden"
+  },
+  content: {
+    padding: "20px",
+    display: "flex",
+    alignItems: "center",
+    gap: "16px",
+    flexWrap: "wrap"
+  },
+  iconContainer: {
+    position: "relative",
+    display: "flex",
+    alignItems: "center"
+  },
+  textContainer: {
+    flex: 1
+  },
+  title: {
+    fontSize: "18px",
+    fontWeight: 700,
+    color: "#E77291",
+    marginBottom: "4px"
+  },
+  description: {
+    fontSize: "13px",
+    color: "white",
+    marginBottom: "4px"
+  },
+  smallText: {
+    fontSize: "11px",
+    color: "rgba(255,255,255,0.7)"
+  },
+  claimBtn: {
+    background: "#E77291",
+    color: "#3E0014",
+    border: "none",
+    padding: "10px 20px",
+    borderRadius: "999px",
+    cursor: "pointer",
+    fontWeight: 600,
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    fontSize: "13px"
+  },
+  countdown: {
+    background: "rgba(0,0,0,0.2)",
+    padding: "8px",
+    textAlign: "center",
+    fontSize: "11px",
+    color: "#E77291"
+  }
+};
+
+// Category Vendor Section Component
+const CategoryVendorSection = () => {
+  const navigate = useNavigate();
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  
+  const filteredVendors = selectedCategory === "all" 
+    ? vendors.slice(0, 4) 
+    : vendors.filter(v => v.category === selectedCategory).slice(0, 4);
+
+  return (
+    <div style={categoryStyles.container}>
+      <div style={categoryStyles.header}>
+        <h3 style={categoryStyles.title}>Browse by Category</h3>
+        <p style={categoryStyles.subtitle}>Find the perfect vendor for every aspect of your wedding</p>
+      </div>
+      
+      <div style={categoryStyles.categoryScroll}>
+        {categories.map(cat => (
+          <button
+            key={cat.id}
+            onClick={() => setSelectedCategory(cat.id)}
+            style={{
+              ...categoryStyles.categoryBtn,
+              ...(selectedCategory === cat.id ? categoryStyles.categoryBtnActive : {})
+            }}
+          >
+            <span>{cat.icon}</span> {cat.label}
+          </button>
+        ))}
+      </div>
+      
+      <div style={categoryStyles.vendorGrid}>
+        {filteredVendors.map(vendor => (
+          <div key={vendor.id} style={categoryStyles.vendorCard} onClick={() => navigate("/package")}>
+            <img src={vendor.image} alt={vendor.name} style={categoryStyles.vendorImage} />
+            <div style={categoryStyles.vendorInfo}>
+              <h4 style={categoryStyles.vendorName}>{vendor.name}</h4>
+              <p style={categoryStyles.vendorService}>{vendor.service}</p>
+              <div style={categoryStyles.vendorFooter}>
+                <span style={categoryStyles.vendorPrice}>{vendor.price}</span>
+                <div style={categoryStyles.rating}>
+                  <Star size={12} fill="#FFD700" color="#FFD700" />
+                  <span>{vendor.rating}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      <button onClick={() => navigate("/package")} style={categoryStyles.viewMoreBtn}>
+        View All Vendors <ChevronRight size={16} />
+      </button>
+    </div>
+  );
+};
+
+const categoryStyles = {
+  container: {
+    marginBottom: "32px"
+  },
+  header: {
+    marginBottom: "20px"
+  },
+  title: {
+    fontFamily: "'DM Serif Display', serif",
+    fontSize: "22px",
+    color: "#3E0014",
+    marginBottom: "4px"
+  },
+  subtitle: {
+    fontSize: "13px",
+    color: "#666"
+  },
+  categoryScroll: {
+    display: "flex",
+    gap: "10px",
+    overflowX: "auto",
+    paddingBottom: "12px",
+    marginBottom: "20px"
+  },
+  categoryBtn: {
+    padding: "8px 16px",
+    borderRadius: "999px",
+    border: "1px solid #F5D0DA",
+    background: "white",
+    cursor: "pointer",
+    fontSize: "13px",
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    whiteSpace: "nowrap"
+  },
+  categoryBtnActive: {
+    background: "#3E0014",
+    color: "white",
+    borderColor: "#3E0014"
+  },
+  vendorGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+    gap: "16px",
+    marginBottom: "20px"
+  },
+  vendorCard: {
+    background: "white",
+    borderRadius: "16px",
+    overflow: "hidden",
+    border: "1px solid #F5D0DA",
+    cursor: "pointer",
+    transition: "transform 0.2s"
+  },
+  vendorImage: {
+    width: "100%",
+    height: "140px",
+    objectFit: "cover"
+  },
+  vendorInfo: {
+    padding: "12px"
+  },
+  vendorName: {
+    fontSize: "14px",
+    fontWeight: 600,
+    marginBottom: "4px"
+  },
+  vendorService: {
+    fontSize: "11px",
+    color: "#E77291",
+    marginBottom: "8px"
+  },
+  vendorFooter: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center"
+  },
+  vendorPrice: {
+    fontSize: "13px",
+    fontWeight: 700,
+    color: "#AC1634"
+  },
+  rating: {
+    display: "flex",
+    alignItems: "center",
+    gap: "4px",
+    fontSize: "12px"
+  },
+  viewMoreBtn: {
+    width: "100%",
+    padding: "12px",
+    borderRadius: "999px",
+    background: "white",
+    border: "1px solid #F5D0DA",
+    cursor: "pointer",
+    fontSize: "14px",
+    fontWeight: 500,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "6px",
+    transition: "all 0.2s"
+  }
+};
+
 export default function CoupleDashboard({ user, setUser }) {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [inviteOpen, setInviteOpen] = useState(false);
   const [showAIAssistant, setShowAIAssistant] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const [codeCopied, setCodeCopied] = useState(false);
   const [urlCopied, setUrlCopied] = useState(false);
   const [loveCode] = useState(() => Math.random().toString(36).substring(2, 8).toUpperCase());
@@ -204,12 +691,19 @@ export default function CoupleDashboard({ user, setUser }) {
   ];
 
   const menuItems = [
-    { icon: "💌", label: "Invitation Designer", path: "/invitation-design" },
-    { icon: "💰", label: "Budget Planner", path: "/budget-planner" },
-    { icon: "🧘", label: "Emotional Wellness", path: "/wellness" },
-    { icon: "🌿", label: "Sustainable Wedding", path: "/sustainability" },
-    { icon: "🤖", label: "AI Wedding Assistant", path: "/ai-assistant" },
-  ];
+  { icon: "💌", label: "Invitation Designer", path: "/invitation-design", isModal: false },
+  { icon: "💰", label: "Budget Planner", path: "/budget-planner", isModal: false },
+  { icon: "🧘", label: "Emotional Wellness", path: "/wellness", isModal: false },
+  { icon: "🌿", label: "Sustainable Wedding", path: "/sustainability", isModal: false },
+  { icon: "🤖", label: "AI Wedding Assistant", isModal: true },  // This one opens modal
+  { icon: "🕉️", label: "Rasam & Riwaz", path: "/rasam-riwaz", isModal: false },
+  { icon: "📜", label: "Legal & Documents", path: "/legal-docs", isModal: false }
+];
+
+  const filteredVendors = vendors.filter(v => 
+    v.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    v.service.toLowerCase().includes(searchTerm.toLowerCase())
+  ).slice(0, 4);
 
   return (
     <div style={styles.appContainer}>
@@ -245,45 +739,86 @@ export default function CoupleDashboard({ user, setUser }) {
         </div>
       </div>
 
-      {/* Sidebar Menu */}
-      {menuOpen && (
-        <>
-          <div onClick={() => setMenuOpen(false)} style={styles.overlay} />
-          <div style={styles.sidebar}>
-            <div style={styles.sidebarHeader}>
-              <HindiLogo size="small" />
-              <button onClick={() => setMenuOpen(false)} style={styles.closeBtn}>
-                <X size={22} />
-              </button>
+      {/* Search Bar */}
+      <div style={styles.searchContainer}>
+        <Search size={18} color="#999" />
+        <input
+          type="text"
+          placeholder="Search for vendors, services, or ideas..."
+          style={styles.searchInput}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        {searchTerm && (
+          <button onClick={() => setSearchTerm("")} style={styles.clearSearchBtn}>✕</button>
+        )}
+      </div>
+
+      {searchTerm && (
+        <div style={styles.searchResults}>
+          <p style={styles.searchResultsTitle}>Search Results ({filteredVendors.length})</p>
+          {filteredVendors.map(v => (
+            <div key={v.id} style={styles.searchResultItem} onClick={() => navigate("/package")}>
+              <img src={v.image} alt={v.name} style={styles.searchResultImage} />
+              <div>
+                <p style={styles.searchResultName}>{v.name}</p>
+                <p style={styles.searchResultService}>{v.service}</p>
+              </div>
+              <button style={styles.searchResultBtn}>View</button>
             </div>
-
-            {navItems.map(n => (
-              <div key={n.path} onClick={() => { navigate(n.path); setMenuOpen(false); }} style={styles.sidebarItem}>
-                <span style={styles.sidebarIcon}>{n.icon}</span>
-                {n.label}
-              </div>
-            ))}
-
-            <div style={styles.divider} />
-            
-            <p style={styles.sidebarSectionTitle}>WEDDING TOOLS</p>
-            
-            {menuItems.map(item => (
-              <div key={item.path} onClick={() => { navigate(item.path); setMenuOpen(false); }} style={styles.sidebarItem}>
-                <span style={styles.sidebarEmoji}>{item.icon}</span>
-                {item.label}
-              </div>
-            ))}
-
-            <div style={styles.sidebarFooter}>
-              <div onClick={() => { setUser(null); navigate("/"); }} style={styles.logoutBtn}>
-                <LogOut size={18} /> Logout
-              </div>
-            </div>
-          </div>
-        </>
+          ))}
+        </div>
       )}
 
+     {/* Sidebar Menu */}
+{menuOpen && (
+  <>
+    <div onClick={() => setMenuOpen(false)} style={styles.overlay} />
+    <div style={styles.sidebar}>
+      <div style={styles.sidebarHeader}>
+        <HindiLogo size="small" />
+        <button onClick={() => setMenuOpen(false)} style={styles.closeBtn}>
+          <X size={22} />
+        </button>
+      </div>
+
+      {navItems.map(n => (
+        <div key={n.path} onClick={() => { navigate(n.path); setMenuOpen(false); }} style={styles.sidebarItem}>
+          <span style={styles.sidebarIcon}>{n.icon}</span>
+          {n.label}
+        </div>
+      ))}
+
+      <div style={styles.divider} />
+      
+      <p style={styles.sidebarSectionTitle}>WEDDING TOOLS</p>
+      
+      {menuItems.map(item => (
+        <div 
+          key={item.label} 
+          onClick={() => { 
+            if (item.isModal) {
+              setShowAIAssistant(true);  // Open AI Assistant modal
+            } else if (item.path) {
+              navigate(item.path);
+            }
+            setMenuOpen(false); 
+          }} 
+          style={styles.sidebarItem}
+        >
+          <span style={styles.sidebarEmoji}>{item.icon}</span>
+          {item.label}
+        </div>
+      ))}
+
+      <div style={styles.sidebarFooter}>
+        <div onClick={() => { setUser(null); navigate("/"); }} style={styles.logoutBtn}>
+          <LogOut size={18} /> Logout
+        </div>
+      </div>
+    </div>
+  </>
+)}
       {/* Main Content */}
       <div style={styles.mainContent}>
         {/* Hero Section - Two Column Grid */}
@@ -315,6 +850,15 @@ export default function CoupleDashboard({ user, setUser }) {
           <WeddingCountdown targetDate={weddingDate} />
         </div>
 
+        {/* Live Offer Banner */}
+        <LiveOfferBanner />
+
+        {/* Featured Vendor Rotator */}
+        <FeaturedVendorRotator />
+
+        {/* Category Vendor Section */}
+        <CategoryVendorSection />
+
         {/* Vendor Offers Section */}
         <div style={styles.vendorSection}>
           <div style={styles.sectionHeader}>
@@ -326,7 +870,7 @@ export default function CoupleDashboard({ user, setUser }) {
           </div>
 
           <div style={styles.vendorGrid}>
-            {vendors.map((v, i) => (
+            {vendors.slice(0, 6).map((v, i) => (
               <div 
                 key={v.id} 
                 style={{
@@ -424,6 +968,14 @@ export default function CoupleDashboard({ user, setUser }) {
         />
       )}
 
+{showAIAssistant && (
+  <AIWeddingAssistant 
+    user={user}
+    weddingDetails={user?.weddingDetails || user}
+    onClose={() => setShowAIAssistant(false)}
+    isOpen={showAIAssistant}
+  />
+)}
       {/* Bottom Navigation */}
       <BottomNav />
     </div>
@@ -488,6 +1040,83 @@ const styles = {
     display: "flex",
     gap: "12px",
     alignItems: "center"
+  },
+  searchContainer: {
+    maxWidth: "1280px",
+    margin: "16px auto 0",
+    padding: "0 32px",
+    position: "relative"
+  },
+  searchInput: {
+    width: "100%",
+    padding: "14px 20px",
+    paddingLeft: "48px",
+    borderRadius: "999px",
+    border: "1px solid #F5D0DA",
+    background: "white",
+    fontSize: "14px",
+    outline: "none",
+    fontFamily: "'DM Sans', sans-serif"
+  },
+  clearSearchBtn: {
+    position: "absolute",
+    right: "48px",
+    top: "50%",
+    transform: "translateY(-50%)",
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    color: "#999",
+    fontSize: "14px"
+  },
+  searchResults: {
+    maxWidth: "1280px",
+    margin: "16px auto",
+    padding: "16px 32px",
+    background: "white",
+    borderRadius: "20px",
+    border: "1px solid #F5D0DA"
+  },
+  searchResultsTitle: {
+    fontSize: "14px",
+    fontWeight: 600,
+    marginBottom: "12px",
+    paddingBottom: "8px",
+    borderBottom: "1px solid #F5D0DA"
+  },
+  searchResultItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: "16px",
+    padding: "12px",
+    cursor: "pointer",
+    borderRadius: "12px",
+    transition: "background 0.2s"
+  },
+  searchResultImage: {
+    width: "50px",
+    height: "50px",
+    borderRadius: "10px",
+    objectFit: "cover"
+  },
+  searchResultName: {
+    fontSize: "14px",
+    fontWeight: 600,
+    marginBottom: "2px"
+  },
+  searchResultService: {
+    fontSize: "12px",
+    color: "#666"
+  },
+  searchResultBtn: {
+    marginLeft: "auto",
+    padding: "6px 16px",
+    borderRadius: "999px",
+    background: "#AC1634",
+    color: "white",
+    border: "none",
+    cursor: "pointer",
+    fontSize: "12px"
   },
   overlay: {
     position: "fixed",

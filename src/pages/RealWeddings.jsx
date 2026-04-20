@@ -150,9 +150,9 @@ export default function RealWeddings() {
           <Sparkles size={32} color="#E77291" />
           <h3 style={styles.ctaTitle}>Start Planning Your Dream Wedding</h3>
           <p style={styles.ctaText}>Join 10,000+ couples who planned their perfect day with Vivaha</p>
-          <button onClick={() => navigate("/role")} style={styles.ctaBtn}>
-            Start Planning Your Wedding → <ArrowRight size={16} />
-          </button>
+         <button onClick={() => navigate("/login")} style={styles.ctaBtn}>
+  Start Planning Your Wedding → <ArrowRight size={16} />
+</button>
         </div>
       </div>
 

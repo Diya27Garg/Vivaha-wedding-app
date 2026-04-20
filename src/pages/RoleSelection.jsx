@@ -1,23 +1,35 @@
 // src/pages/RoleSelection.jsx
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Heart, Briefcase, Sparkles, ArrowRight, Crown, Star } from "lucide-react";
 import HindiLogo from "../components/HindiLogo";
 
-export default function RoleSelection() {
+export default function RoleSelection({ user, setUser }) {
   const navigate = useNavigate();
   const [selectedRole, setSelectedRole] = useState(null);
-  const [animate, setAnimate] = useState(false);
-
-  useEffect(() => {
-    setAnimate(true);
-  }, []);
 
   const handleRoleSelect = (role) => {
     setSelectedRole(role);
+    setUser(prev => ({ ...prev, role: role }));
+    
     setTimeout(() => {
-      navigate("/login", { state: { role: role } });
-    }, 500);
+      // Check if user is new or existing based on isNewUser flag
+      if (user?.isNewUser) {
+        // New user - go to onboarding
+        if (role === "vendor") {
+          navigate("/onboarding/vendor");
+        } else {
+          navigate("/couple-form");
+        }
+      } else {
+        // Existing user - go to dashboard
+        if (role === "vendor") {
+          navigate("/vendor/dashboard");
+        } else {
+          navigate("/home");
+        }
+      }
+    }, 300);
   };
 
   const roles = [
@@ -27,7 +39,7 @@ export default function RoleSelection() {
       icon: Heart,
       description: "Plan your dream wedding with personalized tools, vendor recommendations, and budget tracking",
       color: "#E77291",
-      bgColor: "linear-gradient(135deg, rgba(231,114,145,0.1) 0%, rgba(231,114,145,0.05) 100%)",
+      bgColor: "#E77291",
       features: ["Vendor Discovery", "Budget Planner", "Wedding Checklist", "Inspiration Board"],
       popular: true
     },
@@ -37,7 +49,7 @@ export default function RoleSelection() {
       icon: Briefcase,
       description: "Showcase your services, connect with couples, and grow your wedding business",
       color: "#AC1634",
-      bgColor: "linear-gradient(135deg, rgba(172,22,52,0.1) 0%, rgba(172,22,52,0.05) 100%)",
+      bgColor: "#AC1634",
       features: ["Business Profile", "Booking Management", "Client Messaging", "Performance Analytics"],
       popular: false
     }
@@ -45,11 +57,11 @@ export default function RoleSelection() {
 
   return (
     <div style={styles.container}>
-      {/* Decorative Background Elements */}
+      {/* Background circles */}
       <div style={styles.bgCircle1} />
       <div style={styles.bgCircle2} />
       <div style={styles.bgCircle3} />
-
+      
       {/* Header */}
       <div style={styles.header}>
         <div style={styles.logoWrapper}>
@@ -57,75 +69,52 @@ export default function RoleSelection() {
         </div>
         <div style={styles.tagline}>
           <Sparkles size={14} color="#E77291" />
-          <span>Your wedding journey begins here</span>
+          <span>Complete your profile to continue</span>
           <Sparkles size={14} color="#E77291" />
         </div>
       </div>
 
-      {/* Main Content */}
+      {/* Content */}
       <div style={styles.content}>
-        <h1 style={styles.mainTitle}>
-          Choose Your Role
-        </h1>
-        <p style={styles.subtitle}>
-          Tell us how you'd like to use Vivaha
-        </p>
+        <h1 style={styles.mainTitle}>Choose Your Role</h1>
+        <p style={styles.subtitle}>Tell us how you'd like to use Vivaha</p>
 
         <div style={styles.rolesContainer}>
-          {roles.map((role, index) => {
+          {roles.map((role) => {
             const IconComponent = role.icon;
             const isSelected = selectedRole === role.id;
-            
             return (
-              <button
+              <div
                 key={role.id}
                 onClick={() => handleRoleSelect(role.id)}
                 style={{
                   ...styles.roleCard,
-                  ...(animate ? styles.roleCardAnimate : {}),
-                  animationDelay: `${index * 0.15}s`,
-                  background: isSelected ? role.bgColor : "white",
                   borderColor: isSelected ? role.color : "#F5D0DA",
-                  transform: isSelected ? "scale(1.02)" : "scale(1)",
                   boxShadow: isSelected ? `0 20px 40px ${role.color}20` : "0 4px 16px rgba(62,0,20,0.08)"
                 }}
                 onMouseEnter={(e) => {
-                  if (!isSelected) {
-                    e.currentTarget.style.transform = "translateY(-8px)";
-                    e.currentTarget.style.boxShadow = `0 24px 48px ${role.color}15`;
-                  }
+                  e.currentTarget.style.transform = "translateY(-8px)";
+                  e.currentTarget.style.boxShadow = `0 24px 48px ${role.color}15`;
                 }}
                 onMouseLeave={(e) => {
-                  if (!isSelected) {
-                    e.currentTarget.style.transform = "translateY(0)";
-                    e.currentTarget.style.boxShadow = "0 4px 16px rgba(62,0,20,0.08)";
-                  }
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "0 4px 16px rgba(62,0,20,0.08)";
                 }}
               >
-                {/* Popular Badge */}
                 {role.popular && (
                   <div style={styles.popularBadge}>
                     <Crown size={12} color="#E77291" />
                     <span>Most Popular</span>
                   </div>
                 )}
-
-                {/* Icon Circle */}
-                <div style={{
-                  ...styles.iconCircle,
-                  background: `${role.color}15`,
-                  borderColor: `${role.color}30`
-                }}>
-                  <IconComponent size={48} color={role.color} strokeWidth={1.2} />
-                </div>
-
-                {/* Title */}
-                <h2 style={styles.roleTitle}>{role.title}</h2>
                 
-                {/* Description */}
+                <div style={{ ...styles.iconCircle, background: `${role.color}15`, borderColor: `${role.color}30` }}>
+                  <IconComponent size={48} color={role.color} />
+                </div>
+                
+                <h2 style={styles.roleTitle}>{role.title}</h2>
                 <p style={styles.roleDescription}>{role.description}</p>
-
-                {/* Features List */}
+                
                 <div style={styles.featuresList}>
                   {role.features.map((feature, i) => (
                     <div key={i} style={styles.featureItem}>
@@ -134,48 +123,21 @@ export default function RoleSelection() {
                     </div>
                   ))}
                 </div>
-
-                {/* Action Button */}
-                <div style={{
-                  ...styles.actionButton,
-                  background: role.color,
-                  opacity: isSelected ? 1 : 0.9
-                }}>
+                
+                <div style={{ ...styles.actionButton, background: role.color }}>
                   <span>Continue as {role.id === "bride" ? "Couple" : "Vendor"}</span>
                   <ArrowRight size={16} />
                 </div>
-              </button>
+              </div>
             );
           })}
         </div>
       </div>
 
-      {/* Footer Note */}
+      {/* Footer */}
       <div style={styles.footer}>
         <p>⚡ Both roles are free to start • No credit card required</p>
       </div>
-
-      <style>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes float {
-          0%, 100% {
-            transform: translateY(0) scale(1);
-          }
-          50% {
-            transform: translateY(-20px) scale(1.05);
-          }
-        }
-      `}</style>
     </div>
   );
 }
@@ -199,8 +161,7 @@ const styles = {
     width: "400px",
     height: "400px",
     borderRadius: "50%",
-    background: "radial-gradient(circle, rgba(231,114,145,0.08) 0%, transparent 70%)",
-    animation: "float 8s ease-in-out infinite"
+    background: "radial-gradient(circle, rgba(231,114,145,0.08) 0%, transparent 70%)"
   },
   bgCircle2: {
     position: "absolute",
@@ -209,8 +170,7 @@ const styles = {
     width: "350px",
     height: "350px",
     borderRadius: "50%",
-    background: "radial-gradient(circle, rgba(172,22,52,0.06) 0%, transparent 70%)",
-    animation: "float 10s ease-in-out infinite reverse"
+    background: "radial-gradient(circle, rgba(172,22,52,0.06) 0%, transparent 70%)"
   },
   bgCircle3: {
     position: "absolute",
@@ -219,8 +179,7 @@ const styles = {
     width: "200px",
     height: "200px",
     borderRadius: "50%",
-    background: "radial-gradient(circle, rgba(231,114,145,0.05) 0%, transparent 70%)",
-    animation: "float 12s ease-in-out infinite"
+    background: "radial-gradient(circle, rgba(231,114,145,0.05) 0%, transparent 70%)"
   },
   header: {
     textAlign: "center",
@@ -277,14 +236,9 @@ const styles = {
     borderRadius: "32px",
     border: "2px solid #F5D0DA",
     cursor: "pointer",
-    transition: "all 0.4s cubic-bezier(0.34, 1.2, 0.64, 1)",
+    transition: "all 0.3s ease",
     textAlign: "center",
-    position: "relative",
-    opacity: 0,
-    transform: "translateY(30px)"
-  },
-  roleCardAnimate: {
-    animation: "fadeInUp 0.6s ease-out forwards"
+    position: "relative"
   },
   popularBadge: {
     position: "absolute",
@@ -351,7 +305,6 @@ const styles = {
     color: "white",
     fontWeight: 600,
     fontSize: "14px",
-    transition: "all 0.3s ease",
     marginTop: "8px"
   },
   footer: {
