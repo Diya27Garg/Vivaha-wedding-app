@@ -1,7 +1,6 @@
 // src/App.jsx
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Toaster } from 'react-hot-toast';
 
 // Import all pages
 import SplashScreen from "./pages/SplashScreen";
@@ -60,19 +59,6 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Toaster 
-        position="top-right"
-        toastOptions={{
-          duration: 3000,
-          style: {
-            background: '#3E0014',
-            color: '#fff',
-            fontFamily: "'DM Sans', sans-serif",
-            borderRadius: '12px',
-          },
-        }}
-      />
-      
       <Routes>
         <Route path="/" element={<SplashScreen />} />
         <Route path="/real-weddings" element={<RealWeddings />} />
