@@ -4,174 +4,62 @@
 **Version:** 1.0  
 **Date:** April 23, 2026  
 **Author:** Diya Garg  
-**Course:** Software Engineering, JK Lakshmipat University
-
----
-
-## Table of Contents
-1. Introduction
-2. System Architecture
-3. Component Design
-4. Data Design
-5. User Interface Design
-6. Deployment Diagram
-7. Appendix
 
 ---
 
 ## 1. Introduction
 
 ### 1.1 Purpose
-This document describes the architectural and detailed design of the Vivaha wedding services platform, a full-stack web application connecting couples with verified wedding vendors.
+This document describes the architectural design of the Vivaha wedding platform.
 
 ### 1.2 Scope
-The design covers component architecture, data structures, API integrations, UI/UX design patterns, and deployment strategy.
-
-### 1.3 Definitions
-
-| Term | Definition |
-|------|------------|
-| SPA | Single Page Application |
-| OTP | One-Time Password |
-| API | Application Programming Interface |
-| UI/UX | User Interface/User Experience |
+Covers component architecture, data structures, UI design, and deployment.
 
 ---
 
 ## 2. System Architecture
 
 ### 2.1 High-Level Architecture
-┌─────────────────────────────────────────────────────────────┐
-│ PRESENTATION LAYER │
-│ React 18 + Vite │
-│ ┌──────────┬──────────┬──────────┬──────────┬──────────┐ │
-│ │Dashboard │Checklist │Inspire │ Package │ Profile │ │
-│ └──────────┴──────────┴──────────┴──────────┴──────────┘ │
-├─────────────────────────────────────────────────────────────┤
-│ APPLICATION LAYER │
-│ ┌──────────────────────────────────────────────────────┐ │
-│ │ React Router DOM v7 (Routing) │ │
-│ ├──────────────────────────────────────────────────────┤ │
-│ │ Booking Service (Mock API Layer) │ │
-│ ├──────────────────────────────────────────────────────┤ │
-│ │ State Management (useState) │ │
-│ └──────────────────────────────────────────────────────┘ │
-├─────────────────────────────────────────────────────────────┤
-│ DATA LAYER │
-│ ┌──────────────────────────────────────────────────────┐ │
-│ │ Mock Database (JSON) │ │
-│ │ ┌──────────┬──────────┬──────────┬──────────┐ │ │
-│ │ │ Users │ Vendors │ Bookings │ Tasks │ │ │
-│ │ └──────────┴──────────┴──────────┴──────────┘ │ │
-│ └──────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
 
+- **Presentation Layer**: React 18 + Vite
+- **Application Layer**: React Router + Booking Service
+- **Data Layer**: Mock Database (JSON)
 
-### 2.2 Complete Component Hierarchy
-App.jsx
-│
-├─── Authentication & Entry ────────────────────────────────
-│ ├── SplashScreen
-│ ├── RealWeddings
-│ ├── Login
-│ └── RoleSelection
-│
-├─── Onboarding ────────────────────────────────────────────
-│ ├── CoupleForm
-│ └── VendorForm
-│
-├─── Couple Pages ──────────────────────────────────────────
-│ ├── CoupleDashboard
-│ │ ├── HindiLogo
-│ │ ├── BottomNav
-│ │ ├── GlobalNotifications
-│ │ ├── AIWeddingAssistant
-│ │ ├── WeddingCountdown
-│ │ ├── FeaturedVendorRotator
-│ │ ├── LiveOfferBanner
-│ │ └── CategoryVendorSection
-│ │
-│ ├── Checklist
-│ ├── InspirationBoard
-│ │ └── PinModal
-│ ├── BuildPackage
-│ │ ├── BookingRequestModal
-│ │ └── VendorDetailModal
-│ └── CoupleProfile
-│ └── MeetingScheduler
-│
-├─── Vendor Pages ──────────────────────────────────────────
-│ └── VendorDashboard
-│ ├── Sidebar Navigation
-│ └── GreenScoreCard
-│
-├─── Admin Pages ───────────────────────────────────────────
-│ ├── AdminLogin
-│ └── AdminDashboard
-│ └── Sidebar Navigation
-│
-├─── Feature Pages ─────────────────────────────────────────
-│ ├── PremiumPage
-│ │ ├── PaymentModal
-│ │ └── SuccessScreen
-│ ├── Messaging
-│ │ ├── ChatList
-│ │ └── ChatArea
-│ ├── InvitationDesign
-│ │ ├── CanvaTemplates
-│ │ └── VendorList
-│ ├── BudgetPlanner
-│ │ ├── BudgetOverview
-│ │ └── CategoryBreakdown
-│ ├── WellnessHub
-│ │ ├── MeditationSection
-│ │ ├── YogaSection
-│ │ ├── MusicPlayer
-│ │ └── TherapistsList
-│ ├── SustainabilityHub
-│ │ ├── GreenScore
-│ │ ├── FoodDonation
-│ │ └── GreenVendors
-│ └── ScheduleMeeting
-│ ├── SlotSelector
-│ └── MeetingConfirmation
-│
-├─── Information Pages ─────────────────────────────────────
-│ ├── RasamRiwaz
-│ │ ├── CommunitySelector
-│ │ └── RitualsList
-│ └── LegalDocs
-│ ├── CategoryNav
-│ └── ContentSection
-│
-└─── AI Assistant ──────────────────────────────────────────
-└── AIAssistantPage
-└── AIWeddingAssistant (Demo Mode)
+### 2.2 Component Hierarchy
 
+**Authentication Pages:**
+- SplashScreen → RealWeddings → Login → RoleSelection
 
-### 2.3 Shared Components
+**Onboarding:**
+- CoupleForm, VendorForm
 
-| Component | Purpose | Used On |
-|-----------|---------|---------|
-| HindiLogo | Devanagari script "विवाह" | All pages |
-| BottomNav | Bottom navigation bar | Authenticated pages |
-| GlobalNotifications | Notification bell | Authenticated pages |
-| AIWeddingAssistant | Chat assistant | Dashboard, AI page |
-| BookingRequestModal | Vendor booking form | BuildPackage |
+**Couple Pages:**
+- CoupleDashboard, Checklist, InspirationBoard, BuildPackage, CoupleProfile
 
-### 2.4 Page Summary
+**Vendor Pages:**
+- VendorDashboard
+
+**Admin Pages:**
+- AdminLogin, AdminDashboard
+
+**Feature Pages:**
+- PremiumPage, Messaging, InvitationDesign, BudgetPlanner, WellnessHub, SustainabilityHub, ScheduleMeeting
+
+**Information Pages:**
+- RasamRiwaz, LegalDocs
+
+### 2.3 Page Summary
 
 | Category | Count | Pages |
 |----------|-------|-------|
 | Authentication | 4 | SplashScreen, RealWeddings, Login, RoleSelection |
 | Onboarding | 2 | CoupleForm, VendorForm |
-| Couple Dashboard | 5 | Dashboard, Checklist, Inspiration, Package, Profile |
+| Couple | 5 | Dashboard, Checklist, Inspiration, Package, Profile |
 | Vendor | 1 | VendorDashboard |
 | Admin | 2 | AdminLogin, AdminDashboard |
 | Features | 7 | Premium, Messaging, InvitationDesign, BudgetPlanner, WellnessHub, SustainabilityHub, ScheduleMeeting |
 | Information | 2 | RasamRiwaz, LegalDocs |
-| AI | 1 | AIAssistantPage |
-| **TOTAL** | **24** | **Pages** |
+| **Total** | **23** | |
 
 ---
 
@@ -179,16 +67,125 @@ App.jsx
 
 ### 3.1 Core Components
 
-#### HindiLogo Component
+**HindiLogo Component**
+- Purpose: Display "विवाह" in Devanagari script
+- Props: animated, size
+- Features: Gradient text, fade-in animation
 
-```jsx
-// Purpose: Display "विवाह" in Devanagari script
-// Props: { animated, size }
-// Features: Gradient text, fade-in animation, sparkle effect
-### **BottomNav Component**
-jsx
-// Purpose: Persistent navigation for authenticated users
-// Routes: Home, Checklist, Inspire, Package, Profile
-// Features: Active state highlighting, hover effects
+**BottomNav Component**
+- Purpose: Persistent navigation for authenticated users
+- Routes: Home, Checklist, Inspire, Package, Profile
+- Features: Active state highlighting, hover effects
 
+**GlobalNotifications Component**
+- Purpose: Real-time notification system
+- Features: Bell icon, badge, dropdown menu
+- Types: Accept, Meeting, Confirm, Invoice, Payment
 
+**AIWeddingAssistant Component**
+- Purpose: Chat interface for wedding tips
+- Features: Typing indicator, minimize/maximize
+
+**WeddingCountdown Component**
+- Purpose: Live countdown to wedding date
+- Features: Days/Hours/Minutes/Seconds, progress bar, scratch card
+
+**VendorCard Component**
+- Purpose: Display vendor information
+- Features: Hover details, rating, price, eco badge
+
+**BookingRequestModal Component**
+- Purpose: Collect booking requirements
+- Validation: Date, guests, contact number
+
+### 3.2 Service Layer
+
+**bookingService.js**
+- sendBookingRequest()
+- vendorAccept() / vendorReject()
+- scheduleMeeting()
+- getCoupleBookings() / getVendorBookings()
+
+---
+
+## 4. Data Design
+
+### 4.1 User Object
+
+- id: Number, name: String, email: String
+- role: "couple" | "vendor" | "admin"
+- premium: Boolean, weddingDate: String, budget: String
+
+### 4.2 Vendor Object
+
+- id: Number, name: String, category: String
+- price: String, rating: Number, location: String
+- trustBadges: Array, isPremium: Boolean
+
+### 4.3 Booking Object
+
+- id: Number, vendorId: Number, coupleName: String
+- weddingDate: String, status: String, amount: Number
+
+---
+
+## 5. User Interface Design
+
+### 5.1 Color Palette
+
+| Name | Hex | Usage |
+|------|-----|-------|
+| Rustic Red | #3E0014 | Headers, buttons |
+| Secondary | #7A002B | Gradients |
+| Accent | #AC1634 | CTAs |
+| Deep Blush | #E77291 | Icons |
+| Background | #FDF0F3 | Main background |
+| Borders | #F5D0DA | Cards |
+
+### 5.2 Typography
+
+| Element | Font | Size |
+|---------|------|------|
+| Headings | DM Serif Display | 24-48px |
+| Body | DM Sans | 12-18px |
+| Hindi | Rozha One | 28-80px |
+
+### 5.3 Responsive Breakpoints
+
+| Device | Width | Columns |
+|--------|-------|---------|
+| Mobile | < 640px | 1 |
+| Tablet | 640-1024px | 2 |
+| Desktop | > 1024px | 3-4 |
+
+---
+
+## 6. Deployment
+
+### 6.1 Deployment Commands
+
+npm run build
+git add .
+git commit -m "message"
+git push origin main
+
+### 6.2 Live URL
+
+https://vivaha-wedding-app.vercel.app
+
+---
+
+## 7. Appendix
+
+### 7.1 Future Enhancements
+
+- Real backend with Firebase
+- Real payment gateway
+- Real-time chat
+- Mobile app
+
+---
+
+**Document Prepared By:** Diya Garg  
+**Date:** April 23, 2026  
+**Status:** Final
