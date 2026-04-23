@@ -9,59 +9,74 @@ export default function RoleSelection({ user, setUser }) {
   const [selectedRole, setSelectedRole] = useState(null);
 
   const handleRoleSelect = (role) => {
-    setSelectedRole(role);
-    setUser(prev => ({ ...prev, role: role }));
-    
-    setTimeout(() => {
-      // Check if user is new or existing based on isNewUser flag
-      if (user?.isNewUser) {
-        // New user - go to onboarding
-        if (role === "vendor") {
-          navigate("/onboarding/vendor");
-        } else {
-          navigate("/couple-form");
-        }
+  console.log("Role selected:", role);
+  console.log("Current user:", user);
+  console.log("isNewUser value:", user?.isNewUser);
+  
+  setSelectedRole(role);
+  
+  // Update user with selected role
+  setUser(prev => ({ ...prev, role: role }));
+  
+  // Use a small delay to ensure state updates
+  setTimeout(() => {
+    // Check if user is new (from sign up) or existing (from login)
+    if (user?.isNewUser === true) {
+      console.log("NEW USER - Going to onboarding");
+      if (role === "vendor") {
+        navigate("/onboarding/vendor");
       } else {
-        // Existing user - go to dashboard
-        if (role === "vendor") {
-          navigate("/vendor/dashboard");
-        } else {
-          navigate("/home");
-        }
+        navigate("/couple-form");
       }
-    }, 300);
-  };
-
+    } else {
+      console.log("EXISTING USER - Going to dashboard");
+      if (role === "vendor") {
+        navigate("/vendor/dashboard");
+      } else {
+        navigate("/home");
+      }
+    }
+  }, 300);
+};
   const roles = [
     {
       id: "bride",
-      title: "Bride / Groom",
-      icon: Heart,
-      description: "Plan your dream wedding with personalized tools, vendor recommendations, and budget tracking",
-      color: "#E77291",
-      bgColor: "#E77291",
+      title: "Bride",
+      emoji: "👰",
+      description: "Plan your dream wedding with personalised tools, vendor picks, and budget tracking",
+      color: "#AC1634",
+      accentColor: "#E77291",
       features: ["Vendor Discovery", "Budget Planner", "Wedding Checklist", "Inspiration Board"],
       popular: true
     },
     {
+      id: "groom",
+      title: "Groom",
+      emoji: "🤵",
+      description: "Stay on top of every detail — from vendor bookings to your big day countdown",
+      color: "#3E0014",
+      accentColor: "#7A002B",
+      features: ["Vendor Discovery", "Budget Planner", "Wedding Checklist", "Invitation Design"],
+      popular: false
+    },
+    {
       id: "vendor",
       title: "Vendor",
-      icon: Briefcase,
+      emoji: "💼",
       description: "Showcase your services, connect with couples, and grow your wedding business",
-      color: "#AC1634",
-      bgColor: "#AC1634",
-      features: ["Business Profile", "Booking Management", "Client Messaging", "Performance Analytics"],
+      color: "#5C3D11",
+      accentColor: "#9C6B2E",
+      features: ["Business Profile", "Booking Management", "Client Messaging", "Analytics"],
       popular: false
     }
   ];
 
   return (
     <div style={styles.container}>
-      {/* Background circles */}
       <div style={styles.bgCircle1} />
       <div style={styles.bgCircle2} />
       <div style={styles.bgCircle3} />
-      
+
       {/* Header */}
       <div style={styles.header}>
         <div style={styles.logoWrapper}>
@@ -81,7 +96,6 @@ export default function RoleSelection({ user, setUser }) {
 
         <div style={styles.rolesContainer}>
           {roles.map((role) => {
-            const IconComponent = role.icon;
             const isSelected = selectedRole === role.id;
             return (
               <div
@@ -89,16 +103,23 @@ export default function RoleSelection({ user, setUser }) {
                 onClick={() => handleRoleSelect(role.id)}
                 style={{
                   ...styles.roleCard,
-                  borderColor: isSelected ? role.color : "#F5D0DA",
-                  boxShadow: isSelected ? `0 20px 40px ${role.color}20` : "0 4px 16px rgba(62,0,20,0.08)"
+                  borderColor: isSelected ? role.accentColor : "#F5D0DA",
+                  boxShadow: isSelected
+                    ? `0 20px 40px ${role.accentColor}30`
+                    : "0 4px 16px rgba(62,0,20,0.08)",
+                  transform: isSelected ? "translateY(-8px)" : "translateY(0)"
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateY(-8px)";
-                  e.currentTarget.style.boxShadow = `0 24px 48px ${role.color}15`;
+                  if (!isSelected) {
+                    e.currentTarget.style.transform = "translateY(-6px)";
+                    e.currentTarget.style.boxShadow = `0 16px 32px ${role.accentColor}20`;
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "0 4px 16px rgba(62,0,20,0.08)";
+                  if (!isSelected) {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "0 4px 16px rgba(62,0,20,0.08)";
+                  }
                 }}
               >
                 {role.popular && (
@@ -107,36 +128,62 @@ export default function RoleSelection({ user, setUser }) {
                     <span>Most Popular</span>
                   </div>
                 )}
-                
-                <div style={{ ...styles.iconCircle, background: `${role.color}15`, borderColor: `${role.color}30` }}>
-                  <IconComponent size={48} color={role.color} />
+
+                {/* Emoji icon */}
+                <div
+                  style={{
+                    ...styles.iconCircle,
+                    background: `${role.accentColor}12`,
+                    borderColor: `${role.accentColor}30`
+                  }}
+                >
+                  <span style={{ fontSize: "40px", lineHeight: 1 }}>{role.emoji}</span>
                 </div>
-                
-                <h2 style={styles.roleTitle}>{role.title}</h2>
+
+                <h2 style={{ ...styles.roleTitle, color: role.color }}>{role.title}</h2>
                 <p style={styles.roleDescription}>{role.description}</p>
-                
+
                 <div style={styles.featuresList}>
                   {role.features.map((feature, i) => (
                     <div key={i} style={styles.featureItem}>
-                      <Star size={12} color={role.color} />
+                      <Star size={11} color={role.accentColor} fill={role.accentColor} />
                       <span>{feature}</span>
                     </div>
                   ))}
                 </div>
-                
-                <div style={{ ...styles.actionButton, background: role.color }}>
-                  <span>Continue as {role.id === "bride" ? "Couple" : "Vendor"}</span>
-                  <ArrowRight size={16} />
+
+                <div
+                  style={{
+                    ...styles.actionButton,
+                    background: isSelected
+                      ? `linear-gradient(135deg, ${role.color}, ${role.accentColor})`
+                      : `linear-gradient(135deg, ${role.color}DD, ${role.accentColor}DD)`
+                  }}
+                >
+                  <span>
+                    Continue as{" "}
+                    {role.id === "bride"
+                      ? "Bride"
+                      : role.id === "groom"
+                      ? "Groom"
+                      : "Vendor"}
+                  </span>
+                  <ArrowRight size={15} />
                 </div>
               </div>
             );
           })}
         </div>
+
+        {/* Couple note */}
+        <p style={styles.coupleNote}>
+          💍 Bride &amp; Groom accounts link together — invite your partner after onboarding
+        </p>
       </div>
 
       {/* Footer */}
       <div style={styles.footer}>
-        <p>⚡ Both roles are free to start • No credit card required</p>
+        <p>⚡ All roles are free to start · No credit card required</p>
       </div>
     </div>
   );
@@ -183,7 +230,7 @@ const styles = {
   },
   header: {
     textAlign: "center",
-    marginBottom: "48px",
+    marginBottom: "40px",
     zIndex: 2
   },
   logoWrapper: {
@@ -218,32 +265,33 @@ const styles = {
     fontSize: "16px",
     color: "#7A5560",
     textAlign: "center",
-    marginBottom: "48px"
+    marginBottom: "40px"
   },
   rolesContainer: {
     display: "flex",
-    gap: "32px",
+    gap: "24px",
     justifyContent: "center",
     alignItems: "stretch",
     flexWrap: "wrap"
   },
   roleCard: {
     flex: 1,
-    minWidth: "320px",
-    maxWidth: "450px",
-    padding: "40px 32px",
+    minWidth: "260px",
+    maxWidth: "340px",
+    padding: "36px 28px",
     background: "white",
     borderRadius: "32px",
     border: "2px solid #F5D0DA",
     cursor: "pointer",
-    transition: "all 0.3s ease",
+    transition: "all 0.25s ease",
     textAlign: "center",
     position: "relative"
   },
   popularBadge: {
     position: "absolute",
-    top: "-12px",
-    right: "24px",
+    top: "-14px",
+    left: "50%",
+    transform: "translateX(-50%)",
     background: "white",
     padding: "6px 16px",
     borderRadius: "999px",
@@ -254,45 +302,46 @@ const styles = {
     fontWeight: 600,
     color: "#E77291",
     border: "1px solid #F5D0DA",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.05)"
+    boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+    whiteSpace: "nowrap"
   },
   iconCircle: {
-    width: "100px",
-    height: "100px",
+    width: "88px",
+    height: "88px",
     borderRadius: "50%",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    margin: "0 auto 24px",
+    margin: "0 auto 20px",
     border: "2px solid",
-    transition: "all 0.3s ease"
+    transition: "all 0.25s ease"
   },
   roleTitle: {
     fontFamily: "'DM Serif Display', serif",
     fontStyle: "italic",
-    fontSize: "28px",
-    color: "#3E0014",
-    marginBottom: "12px"
+    fontSize: "26px",
+    marginBottom: "10px"
   },
   roleDescription: {
     fontFamily: "'DM Sans', sans-serif",
-    fontSize: "14px",
+    fontSize: "13px",
     color: "#666",
-    lineHeight: 1.5,
-    marginBottom: "24px"
+    lineHeight: 1.55,
+    marginBottom: "20px"
   },
   featuresList: {
     display: "flex",
     flexDirection: "column",
-    gap: "10px",
-    marginBottom: "32px",
-    padding: "0 16px"
+    gap: "8px",
+    marginBottom: "28px",
+    padding: "0 8px",
+    textAlign: "left"
   },
   featureItem: {
     display: "flex",
     alignItems: "center",
     gap: "10px",
-    fontSize: "13px",
+    fontSize: "12px",
     color: "#555"
   },
   actionButton: {
@@ -300,15 +349,28 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
     gap: "8px",
-    padding: "14px 28px",
+    padding: "13px 24px",
     borderRadius: "999px",
     color: "white",
     fontWeight: 600,
-    fontSize: "14px",
-    marginTop: "8px"
+    fontSize: "13px",
+    width: "100%",
+    boxSizing: "border-box",
+    transition: "opacity 0.2s"
+  },
+  coupleNote: {
+    textAlign: "center",
+    marginTop: "28px",
+    fontSize: "13px",
+    color: "#AC1634",
+    background: "#FDF0F3",
+    padding: "12px 24px",
+    borderRadius: "999px",
+    display: "inline-block",
+    width: "auto"
   },
   footer: {
-    marginTop: "60px",
+    marginTop: "40px",
     textAlign: "center",
     fontSize: "12px",
     color: "#999",

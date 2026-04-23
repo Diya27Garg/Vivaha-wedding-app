@@ -3,17 +3,22 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   Heart, Brain, Smile, BookOpen, Music, Sparkles, MessageCircle, 
-  Calendar, Leaf, Home, Package, User, ShoppingCart,Users, Headphones, Moon, Sun, Flower2, Shield,
-  Video, Phone, Star, Clock, Award, TrendingUp
+  Calendar, Leaf, Home, Package, User, ShoppingCart, 
+  Users, Headphones, Moon, Sun, Flower2, Shield,
+  Video, Phone, Star, Clock, Award, TrendingUp, Menu, X, LogOut,
+  Bell, Settings, Camera, Mail, MapPin, Calendar as CalendarIcon
 } from "lucide-react";
 import HindiLogo from "../components/HindiLogo";
 import BottomNav from "../components/BottomNav";
+import GlobalNotifications from "../components/GlobalNotifications";
 
-export default function WellnessHub() {
+export default function WellnessHub({ user = { premium: false } }) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("meditate");
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [showAIAssistant, setShowAIAssistant] = useState(false);
 
   const yogaSessions = [
     { id: 1, name: "Morning Energy Flow", duration: "20 min", level: "Beginner", instructor: "Priya Sharma", image: "🧘", time: "7:00 AM" },
@@ -55,11 +60,21 @@ export default function WellnessHub() {
   }, []);
 
   const navItems = [
-    { icon: <Home size={20} />, label: "Home", path: "/home" },
-    { icon: <Package size={20} />, label: "Checklist", path: "/checklist" },
-    { icon: <Heart size={20} />, label: "Inspire", path: "/inspiration" },
-    { icon: <ShoppingCart size={20} />, label: "Package", path: "/package" },
-    { icon: <User size={20} />, label: "Profile", path: "/profile" },
+    { icon: <Home size={22} />, label: "Home", path: "/home" },
+    { icon: <Package size={22} />, label: "Checklist", path: "/checklist" },
+    { icon: <Heart size={22} />, label: "Inspire", path: "/inspiration" },
+    { icon: <ShoppingCart size={22} />, label: "Package", path: "/package" },
+    { icon: <User size={22} />, label: "Profile", path: "/profile" }
+  ];
+
+  const menuItems = [
+    { icon: "💌", label: "Invitation Designer", path: "/invitation-design" },
+    { icon: "💰", label: "Budget Planner", path: "/budget-planner" },
+    { icon: "🧘", label: "Emotional Wellness", path: "/wellness" },
+    { icon: "🌿", label: "Sustainable Wedding", path: "/sustainability" },
+    { icon: "🤖", label: "AI Wedding Assistant", isModal: true },
+    { icon: "🕉️", label: "Rasam & Riwaz", path: "/rasam-riwaz" },
+    { icon: "📜", label: "Legal & Documents", path: "/legal-docs" }
   ];
 
   return (
@@ -67,11 +82,29 @@ export default function WellnessHub() {
       {/* Header */}
       <div style={styles.header}>
         <div style={styles.headerContent}>
-          <button onClick={() => navigate(-1)} style={styles.backBtn}>← Back</button>
+          <button onClick={() => setMenuOpen(true)} style={styles.menuBtn}><Menu size={22} /></button>
           <HindiLogo size="small" />
-          <div style={{ width: "70px" }} />
+          <div style={styles.headerRight}>
+            <GlobalNotifications user={user} />
+            <button onClick={() => setShowAIAssistant(true)} style={styles.aiBtn}><Sparkles size={20} /></button>
+            <button onClick={() => navigate("/messages")} style={styles.messageBtn}><MessageCircle size={20} /></button>
+          </div>
         </div>
       </div>
+
+      {/* Sidebar Menu */}
+      {menuOpen && (
+        <>
+          <div onClick={() => setMenuOpen(false)} style={styles.overlay} />
+          <div style={styles.sidebar}>
+            <div style={styles.sidebarHeader}><HindiLogo size="small" /><button onClick={() => setMenuOpen(false)} style={styles.closeBtn}><X size={22} /></button></div>
+            {navItems.map(n => (<div key={n.path} onClick={() => { navigate(n.path); setMenuOpen(false); }} style={styles.sidebarItem}><span style={styles.sidebarIcon}>{n.icon}</span>{n.label}</div>))}
+            <div style={styles.divider} /><p style={styles.sidebarSectionTitle}>WEDDING TOOLS</p>
+            {menuItems.map(item => (<div key={item.label} onClick={() => { if (item.isModal) { setShowAIAssistant(true); } else if (item.path) { navigate(item.path); } setMenuOpen(false); }} style={styles.sidebarItem}><span style={styles.sidebarEmoji}>{item.icon}</span>{item.label}</div>))}
+            <div style={styles.sidebarFooter}><div onClick={() => { setUser(null); navigate("/"); }} style={styles.logoutBtn}><LogOut size={18} /> Logout</div></div>
+          </div>
+        </>
+      )}
 
       {/* Main Content */}
       <div style={styles.mainContent}>
@@ -88,8 +121,8 @@ export default function WellnessHub() {
 
         {/* Rotating Wellness Tip */}
         <div style={styles.tipCard}>
-          <Lightbulb size={20} color="#E77291" />
-          <p style={styles.tipText}>💡 {wellnessTips[currentTip]}</p>
+          <span style={{ fontSize: "20px" }}>💡</span>
+          <p style={styles.tipText}>{wellnessTips[currentTip]}</p>
         </div>
 
         {/* Tabs */}
@@ -98,7 +131,7 @@ export default function WellnessHub() {
             <Brain size={18} /> Meditate
           </button>
           <button style={{...styles.tab, ...(activeTab === "yoga" ? styles.activeTab : {})}} onClick={() => setActiveTab("yoga")}>
-            <Yoga size={18} /> Yoga
+            <span>🧘</span> Yoga
           </button>
           <button style={{...styles.tab, ...(activeTab === "music" ? styles.activeTab : {})}} onClick={() => setActiveTab("music")}>
             <Music size={18} /> Music
@@ -217,15 +250,7 @@ export default function WellnessHub() {
         )}
       </div>
 
-      {/* Bottom Navigation */}
-      <div className="bottom-nav" style={styles.bottomNav}>
-        {navItems.map(item => (
-          <button key={item.path} onClick={() => navigate(item.path)} style={styles.navItem}>
-            {item.icon}
-            <span>{item.label}</span>
-          </button>
-        ))}
-      </div>
+      <BottomNav />
     </div>
   );
 }
@@ -234,7 +259,10 @@ const styles = {
   container: { minHeight: "100vh", background: "#FDF0F3", fontFamily: "'DM Sans', sans-serif" },
   header: { background: "#3E0014", position: "sticky", top: 0, zIndex: 100 },
   headerContent: { maxWidth: "1280px", margin: "0 auto", padding: "16px 32px", display: "flex", justifyContent: "space-between", alignItems: "center" },
-  backBtn: { background: "rgba(231,114,145,0.15)", border: "1px solid rgba(231,114,145,0.3)", color: "#E77291", cursor: "pointer", padding: "8px 16px", borderRadius: "10px" },
+  menuBtn: { background: "rgba(231,114,145,0.15)", border: "1px solid rgba(231,114,145,0.3)", color: "#E77291", cursor: "pointer", padding: "10px", borderRadius: "12px" },
+  headerRight: { display: "flex", gap: "12px", alignItems: "center" },
+  aiBtn: { background: "rgba(231,114,145,0.15)", border: "1px solid rgba(231,114,145,0.3)", color: "#E77291", cursor: "pointer", padding: "10px", borderRadius: "12px" },
+  messageBtn: { background: "rgba(231,114,145,0.15)", border: "1px solid rgba(231,114,145,0.3)", color: "#E77291", cursor: "pointer", padding: "10px", borderRadius: "12px" },
   mainContent: { maxWidth: "1280px", margin: "0 auto", padding: "48px 32px", paddingBottom: "100px" },
   heroSection: { textAlign: "center", marginBottom: "32px" },
   title: { fontFamily: "'DM Serif Display', serif", fontSize: "48px", color: "#3E0014", marginBottom: "12px" },
@@ -265,6 +293,7 @@ const styles = {
   playBtn: { padding: "10px 24px", borderRadius: "999px", background: "#AC1634", color: "white", border: "none", cursor: "pointer", marginTop: "16px" },
   songList: { marginTop: "24px", textAlign: "left" },
   songItem: { display: "flex", justifyContent: "space-between", padding: "12px", borderBottom: "1px solid #F5D0DA" },
+  backBtn: { background: "none", border: "none", color: "#E77291", cursor: "pointer", marginBottom: "16px" },
   emergencyCard: { display: "flex", alignItems: "center", gap: "12px", background: "#FFE5E5", borderRadius: "16px", padding: "16px", marginBottom: "20px" },
   therapistsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))", gap: "16px" },
   therapistCard: { display: "flex", gap: "16px", background: "white", borderRadius: "20px", padding: "20px", border: "1px solid #F5D0DA", alignItems: "center", flexWrap: "wrap" },
@@ -272,6 +301,15 @@ const styles = {
   therapistAvailability: { fontSize: "12px", color: "#4CAF50", marginTop: "4px" },
   therapistPrice: { fontSize: "13px", fontWeight: 600, color: "#AC1634", marginTop: "4px" },
   bookBtn: { marginLeft: "auto", padding: "8px 20px", borderRadius: "999px", background: "#AC1634", color: "white", border: "none", cursor: "pointer" },
-  bottomNav: { position: "fixed", bottom: 0, left: 0, right: 0, background: "white", borderTop: "1px solid #F5D0DA", padding: "12px 32px", display: "flex", justifyContent: "center", gap: "48px", zIndex: 100 },
-  navItem: { display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", background: "none", border: "none", cursor: "pointer", color: "#999", fontSize: "11px" }
+  overlay: { position: "fixed", inset: 0, background: "rgba(62,0,20,0.6)", zIndex: 998 },
+  sidebar: { position: "fixed", top: 0, left: 0, bottom: 0, width: 300, background: "#3E0014", zIndex: 999, padding: "32px 24px", display: "flex", flexDirection: "column", overflowY: "auto" },
+  sidebarHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 },
+  closeBtn: { background: "none", border: "none", color: "#E77291", cursor: "pointer" },
+  sidebarItem: { display: "flex", alignItems: "center", gap: 16, padding: "14px 16px", borderRadius: 12, cursor: "pointer", color: "#FFFFFF", fontSize: 15, marginBottom: 4, background: "rgba(231,114,145,0.08)" },
+  sidebarIcon: { color: "#E77291" },
+  sidebarEmoji: { fontSize: "18px" },
+  divider: { height: "1px", background: "rgba(231,114,145,0.2)", margin: "16px 0" },
+  sidebarSectionTitle: { color: "#E77291", fontSize: "11px", letterSpacing: "1px", marginBottom: 12, paddingLeft: "16px" },
+  sidebarFooter: { marginTop: "auto", paddingTop: 20 },
+  logoutBtn: { display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 12, cursor: "pointer", color: "#E77291", fontSize: 15 }
 };

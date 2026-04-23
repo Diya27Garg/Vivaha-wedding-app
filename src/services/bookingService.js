@@ -1,14 +1,12 @@
-// src/services/bookingService.js
+// src/services/bookingService.js (updated)
 import { mockUsers, mockBookings, mockSlots } from "../data/mockData";
 
-// Mock API service
 class BookingService {
   constructor() {
     this.bookings = [...mockBookings];
     this.listeners = [];
   }
 
-  // Send booking request to vendor
   async sendBookingRequest(vendorId, coupleDetails, requirements) {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -22,15 +20,17 @@ class BookingService {
           coupleName: mockUsers.couple.name,
           coupleEmail: mockUsers.couple.email,
           couplePhone: mockUsers.couple.phone,
-          weddingDate: mockUsers.couple.weddingDate,
-          venue: mockUsers.couple.venue,
+          weddingDate: requirements.eventDate,
+          venue: requirements.venue || mockUsers.couple.venue,
           requirements: requirements,
           status: "pending",
           createdAt: new Date().toISOString(),
           vendorResponse: null,
           meetingScheduled: null,
           paymentStatus: "pending",
-          amount: this.extractPrice(vendor.price)
+          amount: this.extractPrice(vendor.price),
+          invoiceSent: false,
+          paidAt: null
         };
         this.bookings.unshift(request);
         this.notifyListeners();
@@ -39,16 +39,7 @@ class BookingService {
     });
   }
 
-  extractPrice(priceString) {
-    const match = priceString.match(/[\d,]+/);
-    if (match) {
-      return parseInt(match[0].replace(/,/g, ''));
-    }
-    return 50000;
-  }
-
-  // Vendor accepts request
-  async vendorAccept(bookingId, message = "") {
+  async vendorAccept(bookingId, message) {
     return new Promise((resolve) => {
       setTimeout(() => {
         const booking = this.bookings.find(b => b.id === bookingId);
@@ -67,27 +58,6 @@ class BookingService {
     });
   }
 
-  // Vendor rejects request
-  async vendorReject(bookingId, message = "") {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const booking = this.bookings.find(b => b.id === bookingId);
-        if (booking) {
-          booking.status = "rejected";
-          booking.vendorResponse = {
-            action: "reject",
-            message: message || "Unfortunately, we're not available on your wedding date.",
-            respondedAt: new Date().toISOString()
-          };
-          this.notifyListeners();
-          resolve(booking);
-        }
-        resolve(null);
-      }, 1000);
-    });
-  }
-
-  // Schedule meeting
   async scheduleMeeting(bookingId, slot) {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -109,7 +79,6 @@ class BookingService {
     });
   }
 
-  // Confirm booking after meeting
   async confirmBooking(bookingId) {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -125,7 +94,21 @@ class BookingService {
     });
   }
 
-  // Process payment
+  async sendInvoice(bookingId) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const booking = this.bookings.find(b => b.id === bookingId);
+        if (booking) {
+          booking.invoiceSent = true;
+          booking.invoiceSentAt = new Date().toISOString();
+          this.notifyListeners();
+          resolve(booking);
+        }
+        resolve(null);
+      }, 1000);
+    });
+  }
+
   async processPayment(bookingId, paymentDetails) {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -133,9 +116,9 @@ class BookingService {
         if (booking) {
           booking.paymentStatus = "completed";
           booking.status = "booked";
+          booking.paidAt = new Date().toISOString();
           booking.paymentDetails = {
             ...paymentDetails,
-            paidAt: new Date().toISOString(),
             transactionId: `TXN_${Date.now()}`
           };
           this.notifyListeners();
@@ -146,7 +129,14 @@ class BookingService {
     });
   }
 
-  // Get couple's bookings
+  extractPrice(priceString) {
+    const match = priceString.match(/[\d,]+/);
+    if (match) {
+      return parseInt(match[0].replace(/,/g, ''));
+    }
+    return 50000;
+  }
+
   async getCoupleBookings() {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -155,7 +145,6 @@ class BookingService {
     });
   }
 
-  // Get vendor bookings
   async getVendorBookings(vendorId) {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -164,7 +153,6 @@ class BookingService {
     });
   }
 
-  // Get single booking
   async getBooking(bookingId) {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -173,7 +161,6 @@ class BookingService {
     });
   }
 
-  // Subscribe to booking updates
   subscribe(listener) {
     this.listeners.push(listener);
     return () => {
@@ -185,7 +172,6 @@ class BookingService {
     this.listeners.forEach(listener => listener(this.bookings));
   }
 
-  // Get available meeting slots
   async getAvailableSlots() {
     return new Promise((resolve) => {
       setTimeout(() => {

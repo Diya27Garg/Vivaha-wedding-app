@@ -59,17 +59,26 @@ export default function CoupleForm({ setUser }) {
     });
   };
 
-  const finish = () => {
-    setUser(u => ({ 
-      ...u, 
-      ...form, 
-      consentGiven,
-      fullName: `${form.firstName} ${form.lastName}`,
-      onboarded: true 
-    }));
-    navigate("/home");
-  };
+  // In CoupleForm.jsx, update the finish function:
 
+const finish = () => {
+  const fullName = `${form.firstName} ${form.lastName}`;
+  
+  setUser(u => ({ 
+    ...u, 
+    ...form, 
+    consentGiven,
+    fullName: fullName,
+    name: fullName,  // This is what shows on dashboard
+    firstName: form.firstName,
+    lastName: form.lastName,
+    onboarded: true 
+  }));
+  
+  console.log("Updated user with name:", fullName); // Debug log
+  navigate("/home");
+};
+  
   const inputStyle = {
     width: "100%", padding: "13px 16px",
     border: "1.5px solid #F5D0DA", borderRadius: 14,

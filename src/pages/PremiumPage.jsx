@@ -1,292 +1,327 @@
+// src/pages/PremiumPage.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Crown, Check } from "lucide-react";
+import { 
+  Crown, Sparkles, Check, ArrowRight, Shield, Infinity, 
+  Clock, Star, Users, Calendar, MessageCircle, Gift,
+  CreditCard, Wallet, Building2, Lock, Zap, Heart,
+  TrendingUp, Award, Phone, Mail, ChevronRight, X
+} from "lucide-react";
+import HindiLogo from "../components/HindiLogo";
+import BottomNav from "../components/BottomNav";
 
 export default function PremiumPage({ user, setUser }) {
   const navigate = useNavigate();
-  const [step, setStep] = useState(1);
-  const [payMethod, setPayMethod] = useState("upi");
-  const [upi, setUpi] = useState("");
-  const [card, setCard] = useState({ number: "", name: "", expiry: "", cvv: "" });
+  const [showPayment, setShowPayment] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("card");
   const [processing, setProcessing] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
 
-  const handlePayment = async () => {
+  const premiumFeatures = [
+    { icon: <Users size={18} />, title: "50+ Verified Vendors", description: "Access to all premium vendor listings" },
+    { icon: <Sparkles size={18} />, title: "AI Wedding Assistant", description: "Personalized planning advice" },
+    { icon: <Infinity size={18} />, title: "Unlimited Boards", description: "Create unlimited inspiration boards" },
+    { icon: <Calendar size={18} />, title: "Priority Booking", description: "Get faster vendor responses" },
+    { icon: <MessageCircle size={18} />, title: "Dedicated Coordinator", description: "1-on-1 wedding planning support" },
+    { icon: <TrendingUp size={18} />, title: "Budget Analytics", description: "Smart budget tracking & alerts" }
+  ];
+
+  const handlePayment = () => {
     setProcessing(true);
-    await new Promise(r => setTimeout(r, 2500));
-    setProcessing(false);
-    setSuccess(true);
-    setUser(u => ({ ...u, premium: true }));
+    setTimeout(() => {
+      setProcessing(false);
+      setPaymentSuccess(true);
+      setUser(prev => ({ ...prev, premium: true }));
+      setTimeout(() => {
+        navigate("/home");
+      }, 2000);
+    }, 2000);
   };
 
-  const inputStyle = {
-    width: "100%", padding: "13px 16px",
-    border: "1.5px solid #F5D0DA", borderRadius: 14,
-    fontSize: 15, outline: "none", background: "white",
-    color: "#1A1A1A", fontFamily: "'DM Sans', sans-serif"
-  };
-
-  const labelStyle = {
-    fontSize: 11, color: "#AC1634", fontWeight: 700,
-    letterSpacing: 1, marginBottom: 6, display: "block"
-  };
-
-  if (success) return (
-    <div style={{
-      minHeight: "100vh", background: "#3E0014",
-      display: "flex", flexDirection: "column",
-      alignItems: "center", justifyContent: "center",
-      padding: "40px 24px", fontFamily: "'DM Sans', sans-serif",
-      textAlign: "center"
-    }}>
-      <div style={{
-        width: 90, height: 90, borderRadius: "50%",
-        background: "rgba(231,114,145,0.2)",
-        border: "2px solid #E77291",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        marginBottom: 24
-      }}>
-        <Check size={40} color="#E77291" strokeWidth={2} />
+  if (paymentSuccess) {
+    return (
+      <div style={successStyles.container}>
+        <div style={successStyles.card}>
+          <div style={successStyles.icon}>🎉</div>
+          <h1 style={successStyles.title}>Welcome to Premium! 🎊</h1>
+          <p style={successStyles.text}>Your wedding planning just got a whole lot better.</p>
+          <div style={successStyles.features}>
+            <span>✨ AI Assistant Unlocked</span>
+            <span>🔓 All Vendors Unlocked</span>
+            <span>🎨 Unlimited Boards</span>
+          </div>
+          <button onClick={() => navigate("/home")} style={successStyles.btn}>
+            Go to Dashboard →
+          </button>
+        </div>
       </div>
-      <h1 style={{
-        fontFamily: "'DM Serif Display', serif", fontStyle: "italic",
-        color: "#FFFFFF", fontSize: 32, marginBottom: 12
-      }}>Welcome to Premium!</h1>
-      <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 15, marginBottom: 8, lineHeight: 1.7 }}>
-        You now have full access to all vendors, AI planning, and priority support.
-      </p>
-      <div style={{
-        background: "rgba(231,114,145,0.15)",
-        border: "1px solid rgba(231,114,145,0.3)",
-        borderRadius: 16, padding: "16px 28px", marginBottom: 36, marginTop: 8
-      }}>
-        <p style={{ color: "#E77291", fontSize: 13, fontWeight: 600 }}>
-          ₹10,000 paid successfully ✓
-        </p>
+    );
+  }
+
+  if (showPayment) {
+    return (
+      <div style={paymentStyles.container}>
+        <div style={paymentStyles.card}>
+          <button onClick={() => setShowPayment(false)} style={paymentStyles.backBtn}>← Back</button>
+          <div style={paymentStyles.header}>
+            <Crown size={32} color="#E77291" />
+            <h2>Complete Payment</h2>
+            <p>Secure checkout for Vivaha Premium</p>
+          </div>
+
+          <div style={paymentStyles.amountCard}>
+            <span>Total Amount</span>
+            <strong>₹10,000</strong>
+            <small>One-time payment • Lifetime access</small>
+          </div>
+
+          <div style={paymentStyles.methods}>
+            <button onClick={() => setPaymentMethod("card")} style={{...paymentStyles.methodBtn, ...(paymentMethod === "card" ? paymentStyles.methodActive : {})}}>
+              <CreditCard size={18} /> Credit/Debit Card
+            </button>
+            <button onClick={() => setPaymentMethod("upi")} style={{...paymentStyles.methodBtn, ...(paymentMethod === "upi" ? paymentStyles.methodActive : {})}}>
+              <Wallet size={18} /> UPI
+            </button>
+            <button onClick={() => setPaymentMethod("netbanking")} style={{...paymentStyles.methodBtn, ...(paymentMethod === "netbanking" ? paymentStyles.methodActive : {})}}>
+              <Building2 size={18} /> Net Banking
+            </button>
+          </div>
+
+          {paymentMethod === "card" && (
+            <div style={paymentStyles.form}>
+              <input type="text" placeholder="Card Number" style={paymentStyles.input} defaultValue="4242 4242 4242 4242" />
+              <div style={{ display: "flex", gap: "12px" }}>
+                <input type="text" placeholder="MM/YY" style={paymentStyles.input} defaultValue="12/28" />
+                <input type="text" placeholder="CVV" style={paymentStyles.input} defaultValue="123" />
+              </div>
+              <input type="text" placeholder="Cardholder Name" style={paymentStyles.input} defaultValue="TEST USER" />
+            </div>
+          )}
+
+          {paymentMethod === "upi" && (
+            <div style={paymentStyles.form}>
+              <input type="text" placeholder="UPI ID (e.g., username@okhdfcbank)" style={paymentStyles.input} />
+            </div>
+          )}
+
+          {paymentMethod === "netbanking" && (
+            <div style={paymentStyles.form}>
+              <select style={paymentStyles.input}>
+                <option>Select Bank</option>
+                <option>HDFC Bank</option>
+                <option>ICICI Bank</option>
+                <option>SBI</option>
+                <option>Axis Bank</option>
+              </select>
+            </div>
+          )}
+
+          <div style={paymentStyles.security}>
+            <Lock size={14} color="#4CAF50" />
+            <span>Your payment is secure and encrypted</span>
+          </div>
+
+          <button onClick={handlePayment} disabled={processing} style={paymentStyles.payBtn}>
+            {processing ? "Processing..." : `Pay ₹10,000 →`}
+          </button>
+        </div>
       </div>
-      <button onClick={() => navigate("/home")} style={{
-        padding: "15px 48px", background: "#E77291",
-        color: "white", border: "none", borderRadius: 999,
-        fontSize: 16, fontWeight: 700, cursor: "pointer"
-      }}>Start Planning →</button>
-    </div>
-  );
+    );
+  }
 
   return (
-    <div style={{
-      minHeight: "100vh", background: "#FDF0F3",
-      fontFamily: "'DM Sans', sans-serif",
-      display: "flex", flexDirection: "column"
-    }}>
+    <div style={styles.container}>
       {/* Header */}
-      <div style={{
-        background: "#3E0014", padding: "20px",
-        display: "flex", alignItems: "center", gap: 16, flexShrink: 0
-      }}>
-        <button onClick={() => navigate("/home")} style={{
-          background: "rgba(231,114,145,0.15)", border: "1px solid rgba(231,114,145,0.3)",
-          color: "#E77291", cursor: "pointer", display: "flex", padding: "8px", borderRadius: 10
-        }}>
-          <ArrowLeft size={20} strokeWidth={1.5} />
-        </button>
-        <div>
-          <p style={{ color: "#E77291", fontSize: 10, letterSpacing: 2, fontWeight: 700 }}>UPGRADE TO</p>
-          <h1 style={{
-            fontFamily: "'DM Serif Display', serif", fontStyle: "italic",
-            color: "white", fontSize: 22
-          }}>Vivaha Premium</h1>
+      <div style={styles.header}>
+        <div style={styles.headerContent}>
+          <button onClick={() => navigate(-1)} style={styles.backBtn}>← Back</button>
+          <HindiLogo size="small" />
+          <div style={{ width: "70px" }} />
         </div>
       </div>
 
-      <div style={{ flex: 1, overflowY: "auto", padding: "24px 16px" }}>
+      {/* Main Content */}
+      <div style={styles.mainContent}>
+        {/* Hero Section */}
+        <div style={styles.heroSection}>
+          <div style={styles.crownIcon}>
+            <Crown size={48} color="#E77291" />
+          </div>
+          <h1 style={styles.title}>UPGRADE TO <span style={styles.highlight}>Vivaha Premium</span></h1>
+          <p style={styles.subtitle}>Unlock the complete wedding planning experience</p>
+        </div>
 
-        {step === 1 && (
-          <>
-            {/* Benefits Card */}
-            <div style={{
-              background: "#3E0014", borderRadius: 24,
-              padding: "28px 24px", marginBottom: 20,
-              boxShadow: "0 8px 32px rgba(62,0,20,0.25)"
-            }}>
-              <div style={{
-                display: "inline-flex", alignItems: "center", gap: 6,
-                background: "rgba(231,114,145,0.2)", border: "1px solid rgba(231,114,145,0.4)",
-                borderRadius: 99, padding: "5px 16px", marginBottom: 20
-              }}>
-                <Crown size={13} color="#E77291" />
-                <p style={{ color: "#E77291", fontSize: 11, fontWeight: 700, letterSpacing: 1 }}>PREMIUM BENEFITS</p>
-              </div>
+        {/* Pricing Card */}
+        <div style={styles.pricingCard}>
+          <div style={styles.pricingBadge}>BEST VALUE</div>
+          <div style={styles.priceAmount}>
+            <span style={styles.priceCurrency}>₹</span>
+            <span style={styles.priceValue}>10,000</span>
+          </div>
+          <p style={styles.pricePeriod}>One-time payment • Lifetime access</p>
+          <p style={styles.priceNote}>No recurring charges • For your wedding</p>
+          <button onClick={() => setShowPayment(true)} style={styles.upgradeBtn}>
+            Proceed to Payment <ArrowRight size={18} />
+          </button>
+        </div>
 
-              {[
-                ["50+", "Verified wedding vendors"],
-                ["AI", "Powered planning assistant"],
-                ["∞", "Unlimited inspiration boards"],
-                ["1:1", "Dedicated wedding coordinator"],
-                ["⚡", "Priority vendor bookings"],
-              ].map(([icon, text]) => (
-                <div key={text} style={{
-                  display: "flex", alignItems: "center", gap: 14,
-                  padding: "12px 0", borderBottom: "1px solid rgba(255,255,255,0.07)"
-                }}>
-                  <div style={{
-                    width: 36, height: 36, borderRadius: "50%",
-                    background: "rgba(231,114,145,0.15)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    color: "#E77291", fontWeight: 700, fontSize: 13, flexShrink: 0
-                  }}>{icon}</div>
-                  <p style={{ color: "rgba(255,255,255,0.85)", fontSize: 14 }}>{text}</p>
-                  <Check size={16} color="#E77291" strokeWidth={2} style={{ marginLeft: "auto" }} />
-                </div>
-              ))}
-
-              <div style={{
-                marginTop: 24, display: "flex",
-                justifyContent: "space-between", alignItems: "flex-end"
-              }}>
+        {/* Features Grid */}
+        <div style={styles.featuresSection}>
+          <h2 style={styles.sectionTitle}>
+            <Sparkles size={22} color="#E77291" /> Premium Benefits
+          </h2>
+          <div style={styles.featuresGrid}>
+            {premiumFeatures.map((feature, i) => (
+              <div key={i} style={styles.featureCard}>
+                <div style={styles.featureIcon}>{feature.icon}</div>
                 <div>
-                  <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, marginBottom: 4 }}>ONE-TIME PAYMENT</p>
-                  <p style={{
-                    fontFamily: "'DM Serif Display', serif",
-                    color: "white", fontSize: 38
-                  }}>₹10,000</p>
-                  <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>No recurring charges</p>
-                </div>
-                <div style={{ textAlign: "right" }}>
-                  <p style={{ color: "#E77291", fontSize: 12, fontWeight: 600 }}>Lifetime access</p>
-                  <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>For your wedding</p>
+                  <h3 style={styles.featureTitle}>{feature.title}</h3>
+                  <p style={styles.featureDesc}>{feature.description}</p>
                 </div>
               </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Comparison Table */}
+        <div style={styles.comparisonSection}>
+          <h2 style={styles.sectionTitle}>Compare Plans</h2>
+          <div style={styles.comparisonTable}>
+            <div style={styles.comparisonRow}>
+              <span>Vendor Access</span>
+              <span style={styles.freeText}>Limited (2 vendors)</span>
+              <span style={styles.premiumText}>All 50+ vendors</span>
             </div>
-
-            <button onClick={() => setStep(2)} style={{
-              width: "100%", padding: "16px", background: "#3E0014",
-              color: "white", border: "none", borderRadius: 999,
-              fontSize: 16, fontWeight: 700, cursor: "pointer"
-            }}>Proceed to Payment →</button>
-          </>
-        )}
-
-        {step === 2 && (
-          <>
-            <p style={{
-              fontFamily: "'DM Serif Display', serif",
-              color: "#3E0014", fontSize: 20, marginBottom: 20
-            }}>Choose payment method</p>
-
-            {/* Payment Method Toggle */}
-            <div style={{
-              display: "flex", background: "white",
-              borderRadius: 14, padding: 4, marginBottom: 24,
-              border: "1px solid #F5D0DA"
-            }}>
-              {["upi", "card"].map(m => (
-                <button key={m} onClick={() => setPayMethod(m)} style={{
-                  flex: 1, padding: "12px",
-                  background: payMethod === m ? "#3E0014" : "transparent",
-                  color: payMethod === m ? "white" : "#7A5560",
-                  border: "none", borderRadius: 10,
-                  fontWeight: 600, fontSize: 14, cursor: "pointer",
-                  transition: "all 0.2s", textTransform: "uppercase"
-                }}>{m === "upi" ? "UPI" : "Credit / Debit Card"}</button>
-              ))}
+            <div style={styles.comparisonRow}>
+              <span>AI Assistant</span>
+              <span style={styles.freeText}>❌ Locked</span>
+              <span style={styles.premiumText}>✅ Full Access</span>
             </div>
+            <div style={styles.comparisonRow}>
+              <span>Inspiration Boards</span>
+              <span style={styles.freeText}>3 boards</span>
+              <span style={styles.premiumText}>Unlimited</span>
+            </div>
+            <div style={styles.comparisonRow}>
+              <span>Wedding Coordinator</span>
+              <span style={styles.freeText}>❌ Not included</span>
+              <span style={styles.premiumText}>✅ Dedicated support</span>
+            </div>
+            <div style={styles.comparisonRow}>
+              <span>Priority Booking</span>
+              <span style={styles.freeText}>Standard</span>
+              <span style={styles.premiumText}>Priority</span>
+            </div>
+          </div>
+        </div>
 
-            {payMethod === "upi" && (
-              <div style={{
-                background: "white", borderRadius: 20, padding: "24px",
-                border: "1px solid #F5D0DA", marginBottom: 20
-              }}>
-                <label style={labelStyle}>YOUR UPI ID</label>
-                <input style={inputStyle} placeholder="yourname@upi"
-                  value={upi} onChange={e => setUpi(e.target.value)} />
-                <p style={{ color: "#7A5560", fontSize: 12, marginTop: 10 }}>
-                  e.g. 9876543210@paytm, name@gpay, name@phonepe
-                </p>
+        {/* Guarantee Section */}
+        <div style={styles.guaranteeSection}>
+          <Shield size={24} color="#E77291" />
+          <div>
+            <h3>100% Satisfaction Guarantee</h3>
+            <p>Not satisfied? Get a full refund within 7 days of purchase.</p>
+          </div>
+        </div>
 
-                <div style={{
-                  marginTop: 20, background: "#FDF0F3",
-                  borderRadius: 14, padding: "14px",
-                  border: "1px solid #F5D0DA"
-                }}>
-                  <p style={{ color: "#AC1634", fontSize: 12, fontWeight: 700, marginBottom: 6 }}>
-                    PAYMENT SUMMARY
-                  </p>
-                  <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <p style={{ color: "#7A5560", fontSize: 13 }}>Vivaha Premium</p>
-                    <p style={{ color: "#3E0014", fontWeight: 700, fontSize: 13 }}>₹10,000</p>
-                  </div>
-                </div>
-              </div>
-            )}
+        {/* FAQ Section */}
+        <div style={styles.faqSection}>
+          <h2 style={styles.sectionTitle}>Frequently Asked Questions</h2>
+          <div style={styles.faqGrid}>
+            <div style={styles.faqItem}>
+              <h4>💳 Is this a one-time payment?</h4>
+              <p>Yes! ₹10,000 one-time payment gives you lifetime access for your wedding.</p>
+            </div>
+            <div style={styles.faqItem}>
+              <h4>🔄 Can I get a refund?</h4>
+              <p>Yes, we offer a 7-day money-back guarantee if you're not satisfied.</p>
+            </div>
+            <div style={styles.faqItem}>
+              <h4>🎁 What happens after payment?</h4>
+              <p>You'll get immediate access to all premium features on your dashboard.</p>
+            </div>
+            <div style={styles.faqItem}>
+              <h4>👥 Can I share my premium account?</h4>
+              <p>Premium is for one couple's wedding planning journey.</p>
+            </div>
+          </div>
+        </div>
 
-            {payMethod === "card" && (
-              <div style={{
-                background: "white", borderRadius: 20, padding: "24px",
-                border: "1px solid #F5D0DA", marginBottom: 20
-              }}>
-                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                  <div>
-                    <label style={labelStyle}>CARD NUMBER</label>
-                    <input style={inputStyle} placeholder="1234 5678 9012 3456"
-                      maxLength={19}
-                      value={card.number}
-                      onChange={e => setCard(c => ({ ...c, number: e.target.value }))} />
-                  </div>
-                  <div>
-                    <label style={labelStyle}>CARDHOLDER NAME</label>
-                    <input style={inputStyle} placeholder="Priya Sharma"
-                      value={card.name}
-                      onChange={e => setCard(c => ({ ...c, name: e.target.value }))} />
-                  </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                    <div>
-                      <label style={labelStyle}>EXPIRY</label>
-                      <input style={inputStyle} placeholder="MM/YY"
-                        maxLength={5}
-                        value={card.expiry}
-                        onChange={e => setCard(c => ({ ...c, expiry: e.target.value }))} />
-                    </div>
-                    <div>
-                      <label style={labelStyle}>CVV</label>
-                      <input style={inputStyle} placeholder="•••"
-                        maxLength={3} type="password"
-                        value={card.cvv}
-                        onChange={e => setCard(c => ({ ...c, cvv: e.target.value }))} />
-                    </div>
-                  </div>
-                </div>
-
-                <div style={{
-                  marginTop: 20, background: "#FDF0F3",
-                  borderRadius: 14, padding: "14px",
-                  border: "1px solid #F5D0DA"
-                }}>
-                  <p style={{ color: "#AC1634", fontSize: 12, fontWeight: 700, marginBottom: 6 }}>
-                    PAYMENT SUMMARY
-                  </p>
-                  <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <p style={{ color: "#7A5560", fontSize: 13 }}>Vivaha Premium</p>
-                    <p style={{ color: "#3E0014", fontWeight: 700, fontSize: 13 }}>₹10,000</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <button onClick={handlePayment} disabled={processing} style={{
-              width: "100%", padding: "16px",
-              background: processing ? "#ccc" : "#3E0014",
-              color: "white", border: "none", borderRadius: 999,
-              fontSize: 16, fontWeight: 700, cursor: processing ? "not-allowed" : "pointer"
-            }}>
-              {processing ? "Processing payment..." : "Pay ₹10,000 →"}
-            </button>
-
-            <p style={{ color: "#7A5560", fontSize: 12, textAlign: "center", marginTop: 12 }}>
-              🔒 Secure payment · No recurring charges
-            </p>
-          </>
-        )}
+        {/* CTA Bottom */}
+        <div style={styles.ctaBottom}>
+          <Heart size={28} color="#E77291" />
+          <h3>Ready to plan your dream wedding?</h3>
+          <button onClick={() => setShowPayment(true)} style={styles.ctaBtn}>
+            Upgrade to Premium Now <ChevronRight size={18} />
+          </button>
+        </div>
       </div>
+
+      <BottomNav />
     </div>
   );
 }
+
+const styles = {
+  container: { minHeight: "100vh", background: "#FDF0F3", fontFamily: "'DM Sans', sans-serif" },
+  header: { background: "#3E0014", position: "sticky", top: 0, zIndex: 100 },
+  headerContent: { maxWidth: "1280px", margin: "0 auto", padding: "16px 32px", display: "flex", justifyContent: "space-between", alignItems: "center" },
+  backBtn: { background: "rgba(231,114,145,0.15)", border: "1px solid rgba(231,114,145,0.3)", color: "#E77291", cursor: "pointer", padding: "8px 16px", borderRadius: "10px", fontSize: "14px" },
+  mainContent: { maxWidth: "1000px", margin: "0 auto", padding: "48px 32px", paddingBottom: "100px" },
+  heroSection: { textAlign: "center", marginBottom: "48px" },
+  crownIcon: { marginBottom: "20px" },
+  title: { fontFamily: "'DM Serif Display', serif", fontSize: "42px", color: "#3E0014", marginBottom: "16px" },
+  highlight: { color: "#AC1634", textDecoration: "underline", textDecorationColor: "#E77291" },
+  subtitle: { fontSize: "18px", color: "#7A5560" },
+  pricingCard: { background: "linear-gradient(135deg, #3E0014, #7A002B)", borderRadius: "32px", padding: "40px", textAlign: "center", marginBottom: "48px", position: "relative" },
+  pricingBadge: { position: "absolute", top: "-12px", left: "50%", transform: "translateX(-50%)", background: "#E77291", color: "#3E0014", padding: "6px 20px", borderRadius: "999px", fontSize: "12px", fontWeight: 600 },
+  priceAmount: { display: "flex", alignItems: "baseline", justifyContent: "center", gap: "4px", marginBottom: "12px" },
+  priceCurrency: { fontSize: "28px", color: "#E77291", fontWeight: 600 },
+  priceValue: { fontSize: "64px", fontWeight: "bold", color: "white" },
+  pricePeriod: { fontSize: "14px", color: "rgba(255,255,255,0.7)", marginBottom: "8px" },
+  priceNote: { fontSize: "12px", color: "rgba(255,255,255,0.5)", marginBottom: "24px" },
+  upgradeBtn: { background: "#E77291", color: "#3E0014", border: "none", padding: "16px 32px", borderRadius: "999px", fontSize: "16px", fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "8px", transition: "all 0.2s" },
+  featuresSection: { marginBottom: "48px" },
+  sectionTitle: { fontSize: "28px", fontWeight: 600, color: "#3E0014", marginBottom: "24px", display: "flex", alignItems: "center", gap: "8px" },
+  featuresGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "20px" },
+  featureCard: { display: "flex", gap: "16px", padding: "20px", background: "white", borderRadius: "20px", border: "1px solid #F5D0DA" },
+  featureIcon: { width: "40px", height: "40px", borderRadius: "50%", background: "#FDF0F3", display: "flex", alignItems: "center", justifyContent: "center", color: "#AC1634" },
+  featureTitle: { fontSize: "16px", fontWeight: 600, marginBottom: "4px" },
+  featureDesc: { fontSize: "12px", color: "#666" },
+  comparisonSection: { marginBottom: "48px" },
+  comparisonTable: { background: "white", borderRadius: "24px", border: "1px solid #F5D0DA", overflow: "hidden" },
+  comparisonRow: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", padding: "16px 20px", borderBottom: "1px solid #F5D0DA", "&:last-child": { borderBottom: "none" } },
+  freeText: { color: "#999" },
+  premiumText: { color: "#AC1634", fontWeight: 600 },
+  guaranteeSection: { display: "flex", alignItems: "center", gap: "16px", background: "#FDF0F3", padding: "24px", borderRadius: "20px", marginBottom: "48px", border: "1px solid #F5D0DA" },
+  faqSection: { marginBottom: "48px" },
+  faqGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))", gap: "20px" },
+  faqItem: { padding: "20px", background: "white", borderRadius: "20px", border: "1px solid #F5D0DA" },
+  ctaBottom: { textAlign: "center", padding: "40px", background: "linear-gradient(135deg, #FFF5F7, white)", borderRadius: "24px", border: "1px solid #F5D0DA" },
+  ctaBtn: { marginTop: "20px", background: "#3E0014", color: "white", border: "none", padding: "14px 32px", borderRadius: "999px", fontSize: "16px", fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "8px" }
+};
+
+const paymentStyles = {
+  container: { minHeight: "100vh", background: "#FDF0F3", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" },
+  card: { background: "white", borderRadius: "32px", width: "100%", maxWidth: "500px", padding: "32px", boxShadow: "0 20px 40px rgba(0,0,0,0.1)" },
+  backBtn: { background: "none", border: "none", color: "#E77291", cursor: "pointer", marginBottom: "20px", fontSize: "14px" },
+  header: { textAlign: "center", marginBottom: "24px" },
+  amountCard: { background: "#FDF0F3", padding: "20px", borderRadius: "20px", textAlign: "center", marginBottom: "24px" },
+  methods: { display: "flex", gap: "12px", marginBottom: "24px" },
+  methodBtn: { flex: 1, padding: "12px", borderRadius: "12px", border: "1px solid #F5D0DA", background: "white", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", fontSize: "13px" },
+  methodActive: { borderColor: "#AC1634", background: "#FDF0F3", color: "#AC1634" },
+  form: { display: "flex", flexDirection: "column", gap: "16px", marginBottom: "24px" },
+  input: { padding: "14px", borderRadius: "12px", border: "1px solid #F5D0DA", fontSize: "14px", outline: "none" },
+  security: { display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "12px", background: "#FDF0F3", borderRadius: "12px", marginBottom: "24px", fontSize: "12px" },
+  payBtn: { width: "100%", padding: "16px", borderRadius: "999px", background: "#AC1634", color: "white", border: "none", cursor: "pointer", fontWeight: 600, fontSize: "16px" }
+};
+
+const successStyles = {
+  container: { minHeight: "100vh", background: "#FDF0F3", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" },
+  card: { textAlign: "center", background: "white", borderRadius: "32px", padding: "48px", maxWidth: "450px" },
+  icon: { fontSize: "64px", marginBottom: "20px" },
+  title: { fontSize: "28px", fontWeight: 700, color: "#3E0014", marginBottom: "12px" },
+  text: { fontSize: "16px", color: "#666", marginBottom: "24px" },
+  features: { display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "12px", marginBottom: "32px" },
+  btn: { background: "#AC1634", color: "white", border: "none", padding: "14px 32px", borderRadius: "999px", cursor: "pointer", fontSize: "16px", fontWeight: 600 }
+};

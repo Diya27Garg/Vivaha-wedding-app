@@ -5,11 +5,12 @@ import {
   Menu, X, MessageCircle, Home, ClipboardList,
   Sparkles, Package, User, LogOut, Star,
   Copy, Check, Crown, Lock, Calendar, MapPin, Wallet,
-  Heart, Clock, Search, TrendingUp, ChevronRight, Tag, Gift
+  Heart, Clock, Search, TrendingUp, ChevronRight, Tag, Gift, Edit2
 } from "lucide-react";
 import HindiLogo from "../components/HindiLogo";
 import BottomNav from "../components/BottomNav";
 import AIWeddingAssistant from "../components/AIWeddingAssistant";
+import GlobalNotifications from "../components/GlobalNotifications";
 
 const vendors = [
   {
@@ -62,7 +63,7 @@ const vendors = [
   }
 ];
 
-// Featured vendors for rotating display (Top performers this month)
+// Featured vendors for rotating display
 const featuredVendors = [
   {
     id: 1,
@@ -122,19 +123,22 @@ const premiumBenefits = [
   { icon: "✦", text: "Budget tracking & alerts" },
 ];
 
-// Animated Countdown Component
+// Updated Wedding Countdown Component - Redesigned
 const WeddingCountdown = ({ targetDate = "2025-12-15" }) => {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [scratched, setScratched] = useState(false);
   const [tipOfDay, setTipOfDay] = useState(null);
+  const [isHovered, setIsHovered] = useState(false);
 
   const tips = [
-    { tip: "Book your venue at least 8-10 months in advance for best dates!", category: "Venue" },
-    { tip: "Start your wedding website early to share updates with guests!", category: "Planning" },
-    { tip: "Negotiate with vendors - everything is negotiable!", category: "Budget" },
-    { tip: "Take a 10-minute break daily to avoid wedding planning stress!", category: "Wellness" },
-    { tip: "Use digital invitations to save paper and money!", category: "Sustainability" },
-    { tip: "Hire a day-of coordinator to enjoy your special day!", category: "Planning" },
+    { tip: "Book your venue at least 8-10 months in advance for best dates!", category: "Venue", icon: "🏰" },
+    { tip: "Start your wedding website early to share updates with guests!", category: "Planning", icon: "🌐" },
+    { tip: "Negotiate with vendors - everything is negotiable!", category: "Budget", icon: "💰" },
+    { tip: "Take a 10-minute break daily to avoid wedding planning stress!", category: "Wellness", icon: "🧘" },
+    { tip: "Use digital invitations to save paper and money!", category: "Sustainability", icon: "🌿" },
+    { tip: "Hire a day-of coordinator to enjoy your special day!", category: "Planning", icon: "🎯" },
+    { tip: "Book makeup trials at least 3 months in advance!", category: "Beauty", icon: "💄" },
+    { tip: "Send save-the-dates 6-8 months before the wedding!", category: "Planning", icon: "📅" }
   ];
 
   useEffect(() => {
@@ -162,75 +166,280 @@ const WeddingCountdown = ({ targetDate = "2025-12-15" }) => {
     return () => clearInterval(interval);
   }, [targetDate]);
 
+  const planningProgress = Math.min(100, Math.max(0, ((365 - timeLeft.days) / 365) * 100));
+
   return (
-    <div style={countdownStyles.container}>
+    <div 
+      style={countdownStyles.container}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div style={countdownStyles.decorCircle1} />
+      <div style={countdownStyles.decorCircle2} />
+      
       <div style={countdownStyles.header}>
-        <Clock size={16} color="#E77291" />
-        <span style={countdownStyles.countdownLabel}>COUNTDOWN TO YOUR BIG DAY</span>
+        <Clock size={18} color="#E77291" />
+        <span style={countdownStyles.headerLabel}>COUNTDOWN TO YOUR BIG DAY</span>
       </div>
       
-      <div style={countdownStyles.daysContainer}>
+      <div style={countdownStyles.daysSection}>
         <div style={countdownStyles.daysNumber}>{timeLeft.days}</div>
         <div style={countdownStyles.daysLabel}>DAYS LEFT</div>
+        <div style={countdownStyles.monthsHint}>
+          ≈ {Math.floor(timeLeft.days / 30)} months • {Math.floor(timeLeft.days / 7)} weeks
+        </div>
       </div>
       
-      <div style={countdownStyles.timer}>
-        {[
-          { value: String(timeLeft.hours).padStart(2, '0'), label: "Hours" },
-          { value: String(timeLeft.minutes).padStart(2, '0'), label: "Minutes" },
-          { value: String(timeLeft.seconds).padStart(2, '0'), label: "Seconds" }
-        ].map(item => (
-          <div key={item.label} style={countdownStyles.timeBlock}>
-            <span style={countdownStyles.timeValue}>{item.value}</span>
-            <span style={countdownStyles.timeLabel}>{item.label}</span>
-          </div>
-        ))}
+      <div style={countdownStyles.timerGrid}>
+        <div style={countdownStyles.timerBlock}>
+          <div style={countdownStyles.timerValue}>{String(timeLeft.hours).padStart(2, '0')}</div>
+          <div style={countdownStyles.timerLabel}>Hours</div>
+        </div>
+        <div style={countdownStyles.timerSeparator}>:</div>
+        <div style={countdownStyles.timerBlock}>
+          <div style={countdownStyles.timerValue}>{String(timeLeft.minutes).padStart(2, '0')}</div>
+          <div style={countdownStyles.timerLabel}>Minutes</div>
+        </div>
+        <div style={countdownStyles.timerSeparator}>:</div>
+        <div style={countdownStyles.timerBlock}>
+          <div style={countdownStyles.timerValue}>{String(timeLeft.seconds).padStart(2, '0')}</div>
+          <div style={countdownStyles.timerLabel}>Seconds</div>
+        </div>
+      </div>
+
+      <div style={countdownStyles.progressSection}>
+        <div style={countdownStyles.progressLabel}>
+          <span>Planning Progress</span>
+          <span>{Math.round(planningProgress)}%</span>
+        </div>
+        <div style={countdownStyles.progressBar}>
+          <div style={{ ...countdownStyles.progressFill, width: `${planningProgress}%` }} />
+        </div>
       </div>
 
       <div 
-        onClick={() => setScratched(true)}
-        style={countdownStyles.scratchCard}
+        onClick={() => !scratched && setScratched(true)}
+        style={{...countdownStyles.tipCard, ...(isHovered && !scratched ? countdownStyles.tipCardHover : {})}}
       >
         {!scratched ? (
-          <div style={countdownStyles.scratchContent}>
-            <span style={countdownStyles.scratchIcon}>🎁</span>
-            <p style={countdownStyles.scratchText}>Scratch for Wedding Tip!</p>
-            <p style={countdownStyles.scratchHint}>Click to reveal</p>
+          <div style={countdownStyles.tipCover}>
+            <div style={countdownStyles.tipCoverIcon}>🎁</div>
+            <p style={countdownStyles.tipCoverText}>Scratch for Wedding Tip!</p>
+            <p style={countdownStyles.tipCoverHint}>Tap to reveal</p>
           </div>
         ) : (
-          <div style={countdownStyles.tipContent}>
-            <span style={countdownStyles.tipIcon}>💡</span>
-            <div>
+          <div style={countdownStyles.tipRevealed}>
+            <div style={countdownStyles.tipIcon}>{tipOfDay?.icon || "💡"}</div>
+            <div style={countdownStyles.tipContent}>
               <p style={countdownStyles.tipCategory}>{tipOfDay?.category}</p>
               <p style={countdownStyles.tipMessage}>{tipOfDay?.tip}</p>
             </div>
           </div>
         )}
       </div>
+
+      <div style={countdownStyles.milestones}>
+        {timeLeft.days > 180 && <span>📅 6+ months to plan</span>}
+        {timeLeft.days <= 180 && timeLeft.days > 90 && <span>⏰ 3-6 months to go</span>}
+        {timeLeft.days <= 90 && timeLeft.days > 30 && <span>⚡ 1-3 months remaining</span>}
+        {timeLeft.days <= 30 && timeLeft.days > 0 && <span>🔥 Less than a month! Final prep</span>}
+        {timeLeft.days === 0 && <span>🎉 It's your wedding day! 🎉</span>}
+      </div>
     </div>
   );
 };
 
 const countdownStyles = {
-  container: { background: "linear-gradient(135deg, #3E0014, #7A002B)", borderRadius: "24px", padding: "24px", marginBottom: "20px" },
-  header: { display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", marginBottom: "24px" },
-  countdownLabel: { color: "#E77291", fontSize: "10px", letterSpacing: "3px", fontWeight: 600 },
-  daysContainer: { textAlign: "center", marginBottom: "24px" },
-  daysNumber: { fontFamily: "'DM Serif Display', serif", fontSize: "72px", fontWeight: 700, color: "white" },
-  daysLabel: { fontSize: "12px", color: "#E77291", letterSpacing: "4px", marginTop: "8px" },
-  timer: { display: "flex", justifyContent: "center", gap: "24px", marginBottom: "24px" },
-  timeBlock: { textAlign: "center" },
-  timeValue: { display: "block", fontSize: "28px", fontWeight: 700, color: "white" },
-  timeLabel: { fontSize: "10px", color: "rgba(255,255,255,0.6)" },
-  scratchCard: { background: "rgba(255,255,255,0.1)", borderRadius: "16px", padding: "16px", cursor: "pointer" },
-  scratchContent: { textAlign: "center", padding: "12px" },
-  scratchIcon: { fontSize: "32px", display: "block", marginBottom: "8px" },
-  scratchText: { fontSize: "14px", fontWeight: 600, color: "#E77291", marginBottom: "4px" },
-  scratchHint: { fontSize: "11px", color: "rgba(255,255,255,0.5)" },
-  tipContent: { display: "flex", gap: "12px", alignItems: "center" },
-  tipIcon: { fontSize: "28px" },
-  tipCategory: { fontSize: "10px", color: "#E77291", fontWeight: 600, marginBottom: "4px" },
-  tipMessage: { fontSize: "13px", color: "white", lineHeight: 1.4, margin: 0 }
+  container: {
+    background: "linear-gradient(135deg, #3E0014 0%, #7A002B 100%)",
+    borderRadius: "28px",
+    padding: "28px",
+    position: "relative",
+    overflow: "hidden",
+    transition: "transform 0.3s ease"
+  },
+  decorCircle1: {
+    position: "absolute",
+    top: "-50px",
+    right: "-50px",
+    width: "150px",
+    height: "150px",
+    borderRadius: "50%",
+    background: "rgba(231,114,145,0.08)"
+  },
+  decorCircle2: {
+    position: "absolute",
+    bottom: "-30px",
+    left: "-30px",
+    width: "100px",
+    height: "100px",
+    borderRadius: "50%",
+    background: "rgba(231,114,145,0.06)"
+  },
+  header: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "8px",
+    marginBottom: "24px",
+    position: "relative",
+    zIndex: 2
+  },
+  headerLabel: {
+    color: "#E77291",
+    fontSize: "11px",
+    letterSpacing: "3px",
+    fontWeight: 600
+  },
+  daysSection: {
+    textAlign: "center",
+    marginBottom: "24px",
+    position: "relative",
+    zIndex: 2
+  },
+  daysNumber: {
+    fontFamily: "'DM Serif Display', serif",
+    fontSize: "84px",
+    fontWeight: 700,
+    color: "white",
+    lineHeight: 1,
+    textShadow: "0 4px 20px rgba(231,114,145,0.3)"
+  },
+  daysLabel: {
+    fontSize: "14px",
+    color: "#E77291",
+    letterSpacing: "4px",
+    marginTop: "8px",
+    fontWeight: 500
+  },
+  monthsHint: {
+    fontSize: "11px",
+    color: "rgba(255,255,255,0.5)",
+    marginTop: "8px"
+  },
+  timerGrid: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "16px",
+    marginBottom: "24px",
+    position: "relative",
+    zIndex: 2
+  },
+  timerBlock: {
+    textAlign: "center",
+    background: "rgba(255,255,255,0.1)",
+    backdropFilter: "blur(10px)",
+    borderRadius: "16px",
+    padding: "12px 16px",
+    minWidth: "70px"
+  },
+  timerValue: {
+    fontSize: "32px",
+    fontWeight: 700,
+    color: "white",
+    fontFamily: "'DM Sans', sans-serif"
+  },
+  timerLabel: {
+    fontSize: "10px",
+    color: "rgba(255,255,255,0.6)",
+    textTransform: "uppercase"
+  },
+  timerSeparator: {
+    fontSize: "28px",
+    fontWeight: 700,
+    color: "#E77291"
+  },
+  progressSection: {
+    marginBottom: "20px",
+    position: "relative",
+    zIndex: 2
+  },
+  progressLabel: {
+    display: "flex",
+    justifyContent: "space-between",
+    fontSize: "11px",
+    color: "rgba(255,255,255,0.6)",
+    marginBottom: "8px"
+  },
+  progressBar: {
+    height: "6px",
+    background: "rgba(255,255,255,0.2)",
+    borderRadius: "3px",
+    overflow: "hidden"
+  },
+  progressFill: {
+    height: "100%",
+    background: "#E77291",
+    borderRadius: "3px",
+    transition: "width 0.5s ease"
+  },
+  tipCard: {
+    background: "rgba(255,255,255,0.1)",
+    backdropFilter: "blur(10px)",
+    borderRadius: "16px",
+    padding: "16px",
+    cursor: "pointer",
+    transition: "all 0.3s ease",
+    marginBottom: "16px",
+    position: "relative",
+    zIndex: 2
+  },
+  tipCardHover: {
+    background: "rgba(255,255,255,0.15)",
+    transform: "scale(1.02)"
+  },
+  tipCover: {
+    textAlign: "center",
+    padding: "8px"
+  },
+  tipCoverIcon: {
+    fontSize: "32px",
+    marginBottom: "8px"
+  },
+  tipCoverText: {
+    fontSize: "14px",
+    fontWeight: 600,
+    color: "#E77291",
+    marginBottom: "4px"
+  },
+  tipCoverHint: {
+    fontSize: "11px",
+    color: "rgba(255,255,255,0.5)"
+  },
+  tipRevealed: {
+    display: "flex",
+    gap: "14px",
+    alignItems: "center"
+  },
+  tipIcon: {
+    fontSize: "32px"
+  },
+  tipContent: {
+    flex: 1
+  },
+  tipCategory: {
+    fontSize: "10px",
+    color: "#E77291",
+    fontWeight: 600,
+    marginBottom: "4px"
+  },
+  tipMessage: {
+    fontSize: "13px",
+    color: "white",
+    lineHeight: 1.4,
+    margin: 0
+  },
+  milestones: {
+    textAlign: "center",
+    fontSize: "11px",
+    color: "#E77291",
+    padding: "8px",
+    background: "rgba(255,255,255,0.05)",
+    borderRadius: "999px",
+    position: "relative",
+    zIndex: 2
+  }
 };
 
 // Featured Vendor Rotator Component
@@ -691,14 +900,14 @@ export default function CoupleDashboard({ user, setUser }) {
   ];
 
   const menuItems = [
-  { icon: "💌", label: "Invitation Designer", path: "/invitation-design", isModal: false },
-  { icon: "💰", label: "Budget Planner", path: "/budget-planner", isModal: false },
-  { icon: "🧘", label: "Emotional Wellness", path: "/wellness", isModal: false },
-  { icon: "🌿", label: "Sustainable Wedding", path: "/sustainability", isModal: false },
-  { icon: "🤖", label: "AI Wedding Assistant", isModal: true },  // This one opens modal
-  { icon: "🕉️", label: "Rasam & Riwaz", path: "/rasam-riwaz", isModal: false },
-  { icon: "📜", label: "Legal & Documents", path: "/legal-docs", isModal: false }
-];
+    { icon: "💌", label: "Invitation Designer", path: "/invitation-design", isModal: false },
+    { icon: "💰", label: "Budget Planner", path: "/budget-planner", isModal: false },
+    { icon: "🧘", label: "Emotional Wellness", path: "/wellness", isModal: false },
+    { icon: "🌿", label: "Sustainable Wedding", path: "/sustainability", isModal: false },
+    { icon: "🤖", label: "AI Wedding Assistant", isModal: true },
+    { icon: "🕉️", label: "Rasam & Riwaz", path: "/rasam-riwaz", isModal: false },
+    { icon: "📜", label: "Legal & Documents", path: "/legal-docs", isModal: false }
+  ];
 
   const filteredVendors = vendors.filter(v => 
     v.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -717,6 +926,7 @@ export default function CoupleDashboard({ user, setUser }) {
           <HindiLogo size="small" />
           
           <div style={styles.headerRight}>
+            <GlobalNotifications user={user} />
             <button 
               onClick={() => setShowAIAssistant(true)} 
               style={styles.aiBtn}
@@ -770,55 +980,56 @@ export default function CoupleDashboard({ user, setUser }) {
         </div>
       )}
 
-     {/* Sidebar Menu */}
-{menuOpen && (
-  <>
-    <div onClick={() => setMenuOpen(false)} style={styles.overlay} />
-    <div style={styles.sidebar}>
-      <div style={styles.sidebarHeader}>
-        <HindiLogo size="small" />
-        <button onClick={() => setMenuOpen(false)} style={styles.closeBtn}>
-          <X size={22} />
-        </button>
-      </div>
+      {/* Sidebar Menu */}
+      {menuOpen && (
+        <>
+          <div onClick={() => setMenuOpen(false)} style={styles.overlay} />
+          <div style={styles.sidebar}>
+            <div style={styles.sidebarHeader}>
+              <HindiLogo size="small" />
+              <button onClick={() => setMenuOpen(false)} style={styles.closeBtn}>
+                <X size={22} />
+              </button>
+            </div>
 
-      {navItems.map(n => (
-        <div key={n.path} onClick={() => { navigate(n.path); setMenuOpen(false); }} style={styles.sidebarItem}>
-          <span style={styles.sidebarIcon}>{n.icon}</span>
-          {n.label}
-        </div>
-      ))}
+            {navItems.map(n => (
+              <div key={n.path} onClick={() => { navigate(n.path); setMenuOpen(false); }} style={styles.sidebarItem}>
+                <span style={styles.sidebarIcon}>{n.icon}</span>
+                {n.label}
+              </div>
+            ))}
 
-      <div style={styles.divider} />
-      
-      <p style={styles.sidebarSectionTitle}>WEDDING TOOLS</p>
-      
-      {menuItems.map(item => (
-        <div 
-          key={item.label} 
-          onClick={() => { 
-            if (item.isModal) {
-              setShowAIAssistant(true);  // Open AI Assistant modal
-            } else if (item.path) {
-              navigate(item.path);
-            }
-            setMenuOpen(false); 
-          }} 
-          style={styles.sidebarItem}
-        >
-          <span style={styles.sidebarEmoji}>{item.icon}</span>
-          {item.label}
-        </div>
-      ))}
+            <div style={styles.divider} />
+            
+            <p style={styles.sidebarSectionTitle}>WEDDING TOOLS</p>
+            
+            {menuItems.map(item => (
+              <div 
+                key={item.label} 
+                onClick={() => { 
+                  if (item.isModal) {
+                    setShowAIAssistant(true);
+                  } else if (item.path) {
+                    navigate(item.path);
+                  }
+                  setMenuOpen(false); 
+                }} 
+                style={styles.sidebarItem}
+              >
+                <span style={styles.sidebarEmoji}>{item.icon}</span>
+                {item.label}
+              </div>
+            ))}
 
-      <div style={styles.sidebarFooter}>
-        <div onClick={() => { setUser(null); navigate("/"); }} style={styles.logoutBtn}>
-          <LogOut size={18} /> Logout
-        </div>
-      </div>
-    </div>
-  </>
-)}
+            <div style={styles.sidebarFooter}>
+              <div onClick={() => { setUser(null); navigate("/"); }} style={styles.logoutBtn}>
+                <LogOut size={18} /> Logout
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
       {/* Main Content */}
       <div style={styles.mainContent}>
         {/* Hero Section - Two Column Grid */}
@@ -826,18 +1037,28 @@ export default function CoupleDashboard({ user, setUser }) {
           {/* Welcome Card */}
           <div style={styles.welcomeCard}>
             <p style={styles.welcomeBadge}>WELCOME BACK</p>
-            <h1 style={styles.welcomeTitle}>Welcome, {user?.name || "Guest"}! 💍</h1>
+            <h1 style={styles.welcomeTitle}>
+              Welcome, {user?.name || user?.fullName || user?.firstName || "Guest"}! 💍
+            </h1>
             <p style={styles.welcomeText}>Your dream wedding is coming together beautifully.</p>
             
             <div style={styles.infoGrid}>
+              {/* Wedding Date - Display Only */}
               <div style={styles.infoPill}>
-                <Calendar size={14} /> {weddingDate !== "2025-12-15" ? weddingDate : "Set date"}
+                <Calendar size={14} />
+                <span>{weddingDate !== "2025-12-15" ? weddingDate : "Not set yet"}</span>
               </div>
+
+              {/* Location/City - Display Only */}
               <div style={styles.infoPill}>
-                <MapPin size={14} /> {user?.weddingDetails?.city || user?.city || "Set location"}
+                <MapPin size={14} />
+                <span>{user?.weddingDetails?.city || user?.city || "Not set yet"}</span>
               </div>
+
+              {/* Budget - Display Only */}
               <div style={styles.infoPill}>
-                <Wallet size={14} /> {user?.weddingDetails?.budget || user?.budget || "Set budget"}
+                <Wallet size={14} />
+                <span>{user?.weddingDetails?.budget || user?.budget || "Not set yet"}</span>
               </div>
             </div>
             
@@ -968,15 +1189,6 @@ export default function CoupleDashboard({ user, setUser }) {
         />
       )}
 
-{showAIAssistant && (
-  <AIWeddingAssistant 
-    user={user}
-    weddingDetails={user?.weddingDetails || user}
-    onClose={() => setShowAIAssistant(false)}
-    isOpen={showAIAssistant}
-  />
-)}
-      {/* Bottom Navigation */}
       <BottomNav />
     </div>
   );

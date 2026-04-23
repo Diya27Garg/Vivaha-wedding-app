@@ -12,249 +12,8 @@ import {
 } from "lucide-react";
 import HindiLogo from "../components/HindiLogo";
 import BottomNav from "../components/BottomNav";
-
-// Green Score Card Component
-const GreenScoreCard = ({ vendorProfile, setVendorProfile }) => {
-  const [showTips, setShowTips] = useState(false);
-  
-  // Calculate green score based on vendor practices
-  const calculateGreenScore = () => {
-    let score = vendorProfile.greenScore || 0;
-    if (vendorProfile.ecoFriendly) score += 30;
-    if (vendorProfile.zeroWaste) score += 25;
-    if (vendorProfile.localSourcing) score += 20;
-    if (vendorProfile.recyclableMaterials) score += 15;
-    if (vendorProfile.energyEfficient) score += 10;
-    return Math.min(score, 100);
-  };
-
-  const greenScore = calculateGreenScore();
-  
-  // Tips from client reviews to improve green score
-  const greenTips = [
-    { id: 1, tip: "Use LED lighting instead of traditional lights", impact: "+15 points", from: "Client Review" },
-    { id: 2, tip: "Source flowers locally to reduce carbon footprint", impact: "+20 points", from: "Multiple Reviews" },
-    { id: 3, tip: "Offer digital invoices and contracts", impact: "+10 points", from: "Eco-conscious couples" },
-    { id: 4, tip: "Use reusable decor items instead of single-use", impact: "+25 points", from: "Client Suggestion" },
-    { id: 5, tip: "Compost event waste after setup", impact: "+15 points", from: "Sustainability Expert" },
-    { id: 6, tip: "Partner with other green vendors", impact: "+10 points", from: "Industry Best Practice" },
-    { id: 7, tip: "Switch to renewable energy for your studio", impact: "+20 points", from: "Green Initiative" },
-    { id: 8, tip: "Offer paperless billing and receipts", impact: "+10 points", from: "Client Request" }
-  ];
-
-  const getScoreColor = () => {
-    if (greenScore >= 80) return "#4CAF50";
-    if (greenScore >= 60) return "#8BC34A";
-    if (greenScore >= 40) return "#FFC107";
-    return "#FF9800";
-  };
-
-  const getScoreLabel = () => {
-    if (greenScore >= 80) return "Eco-Champion 🌟";
-    if (greenScore >= 60) return "Green Leader 🌿";
-    if (greenScore >= 40) return "Eco-Aware 💚";
-    return "Getting Started 🌱";
-  };
-
-  return (
-    <div style={greenScoreStyles.container}>
-      <div style={greenScoreStyles.header}>
-        <Leaf size={24} color="#2d6a4f" />
-        <h3 style={greenScoreStyles.title}>Green Wedding Score</h3>
-        <button 
-          style={greenScoreStyles.infoBtn}
-          onClick={() => setShowTips(!showTips)}
-        >
-          {showTips ? "Hide Tips ↑" : "View Tips ↓"}
-        </button>
-      </div>
-      
-      <div style={greenScoreStyles.scoreContainer}>
-        <div style={greenScoreStyles.scoreCircle}>
-          <svg width="120" height="120" viewBox="0 0 120 120">
-            <circle cx="60" cy="60" r="54" fill="none" stroke="#E8F5E9" strokeWidth="8"/>
-            <circle 
-              cx="60" cy="60" r="54" fill="none" 
-              stroke={getScoreColor()} strokeWidth="8"
-              strokeDasharray={`${(greenScore / 100) * 339.3} 339.3`}
-              strokeLinecap="round"
-              transform="rotate(-90 60 60)"
-              style={{ transition: "stroke-dasharray 1s ease" }}
-            />
-            <text x="60" y="55" textAnchor="middle" fontSize="24" fontWeight="bold" fill="#3E0014">{greenScore}</text>
-            <text x="60" y="75" textAnchor="middle" fontSize="10" fill="#666">points</text>
-          </svg>
-        </div>
-        <div style={greenScoreStyles.scoreInfo}>
-          <p style={greenScoreStyles.scoreLabel}>{getScoreLabel()}</p>
-          <p style={greenScoreStyles.scoreText}>
-            {greenScore >= 80 ? "Excellent! You're a sustainability leader! 🎉" :
-             greenScore >= 60 ? "Great! You're on the right track! Keep going!" :
-             greenScore >= 40 ? "Good start! Small changes make big impact!" :
-             "Start your green journey today! Every step counts."}
-          </p>
-          <div style={greenScoreStyles.badges}>
-            {greenScore >= 80 && <span style={greenScoreStyles.badge}>🌿 Eco-Champion</span>}
-            {greenScore >= 60 && <span style={greenScoreStyles.badge}>♻️ Zero Waste</span>}
-            {greenScore >= 40 && <span style={greenScoreStyles.badge}>🌱 Eco-Aware</span>}
-            {vendorProfile.localSourcing && <span style={greenScoreStyles.badge}>📍 Local Sourcing</span>}
-            {vendorProfile.ecoFriendly && <span style={greenScoreStyles.badge}>💚 Eco-Friendly</span>}
-          </div>
-        </div>
-      </div>
-
-      {showTips && (
-        <div style={greenScoreStyles.tipsContainer}>
-          <h4 style={greenScoreStyles.tipsTitle}>📈 Ways to Improve Your Green Score</h4>
-          <p style={greenScoreStyles.tipsSubtitle}>Based on client feedback and industry standards</p>
-          {greenTips.map(tip => (
-            <div key={tip.id} style={greenScoreStyles.tipCard}>
-              <div style={greenScoreStyles.tipIcon}>💡</div>
-              <div style={greenScoreStyles.tipContent}>
-                <p style={greenScoreStyles.tipText}>{tip.tip}</p>
-                <div style={greenScoreStyles.tipMeta}>
-                  <span style={greenScoreStyles.tipImpact}>{tip.impact}</span>
-                  <span style={greenScoreStyles.tipFrom}>📝 {tip.from}</span>
-                </div>
-              </div>
-            </div>
-          ))}
-          <button style={greenScoreStyles.improveBtn}>
-            Get Personalized Green Audit →
-          </button>
-        </div>
-      )}
-    </div>
-  );
-};
-
-const greenScoreStyles = {
-  container: {
-    background: "white",
-    borderRadius: "20px",
-    padding: "24px",
-    marginBottom: "24px",
-    border: "1px solid #F5D0DA"
-  },
-  header: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    marginBottom: "20px",
-    flexWrap: "wrap"
-  },
-  title: {
-    fontSize: "18px",
-    fontWeight: 600,
-    color: "#3E0014",
-    margin: 0,
-    flex: 1
-  },
-  infoBtn: {
-    background: "#FDF0F3",
-    border: "1px solid #F5D0DA",
-    padding: "6px 16px",
-    borderRadius: "999px",
-    cursor: "pointer",
-    fontSize: "12px",
-    color: "#AC1634"
-  },
-  scoreContainer: {
-    display: "flex",
-    gap: "24px",
-    alignItems: "center",
-    flexWrap: "wrap",
-    marginBottom: "16px"
-  },
-  scoreCircle: {
-    position: "relative"
-  },
-  scoreInfo: {
-    flex: 1
-  },
-  scoreLabel: {
-    fontSize: "20px",
-    fontWeight: "bold",
-    color: "#2d6a4f",
-    marginBottom: "8px"
-  },
-  scoreText: {
-    fontSize: "13px",
-    color: "#666",
-    marginBottom: "12px"
-  },
-  badges: {
-    display: "flex",
-    gap: "8px",
-    flexWrap: "wrap"
-  },
-  badge: {
-    background: "#E8F5E9",
-    color: "#2d6a4f",
-    padding: "4px 12px",
-    borderRadius: "999px",
-    fontSize: "11px",
-    fontWeight: 600
-  },
-  tipsContainer: {
-    marginTop: "20px",
-    paddingTop: "20px",
-    borderTop: "1px solid #F5D0DA"
-  },
-  tipsTitle: {
-    fontSize: "16px",
-    fontWeight: 600,
-    marginBottom: "4px"
-  },
-  tipsSubtitle: {
-    fontSize: "12px",
-    color: "#666",
-    marginBottom: "16px"
-  },
-  tipCard: {
-    display: "flex",
-    gap: "12px",
-    padding: "12px",
-    background: "#FDF0F3",
-    borderRadius: "12px",
-    marginBottom: "10px"
-  },
-  tipIcon: {
-    fontSize: "20px"
-  },
-  tipContent: {
-    flex: 1
-  },
-  tipText: {
-    fontSize: "13px",
-    fontWeight: 500,
-    marginBottom: "6px"
-  },
-  tipMeta: {
-    display: "flex",
-    gap: "16px",
-    fontSize: "11px",
-    flexWrap: "wrap"
-  },
-  tipImpact: {
-    color: "#4CAF50",
-    fontWeight: 600
-  },
-  tipFrom: {
-    color: "#999"
-  },
-  improveBtn: {
-    width: "100%",
-    marginTop: "16px",
-    padding: "12px",
-    borderRadius: "999px",
-    background: "#2d6a4f",
-    color: "white",
-    border: "none",
-    cursor: "pointer",
-    fontWeight: 600
-  }
-};
+import GlobalNotifications from "../components/GlobalNotifications";
+import { bookingService } from "../services/bookingService";
 
 export default function VendorDashboard({ user, setUser }) {
   const navigate = useNavigate();
@@ -266,8 +25,11 @@ export default function VendorDashboard({ user, setUser }) {
   const [showPortfolioModal, setShowPortfolioModal] = useState(false);
   const [showPowerPairModal, setShowPowerPairModal] = useState(false);
   const [editingProfile, setEditingProfile] = useState(false);
+  const [bookingRequests, setBookingRequests] = useState([]);
+  const [upcomingBookings, setUpcomingBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
   
-  // Vendor Data with Green Metrics
+  // Vendor Data
   const [vendorProfile, setVendorProfile] = useState({
     businessName: "Lens & Love Studio",
     ownerName: "Rajesh Mehta",
@@ -276,7 +38,7 @@ export default function VendorDashboard({ user, setUser }) {
     category: "Photography",
     experience: "10+ years",
     location: "Mumbai, Delhi, Jaipur",
-    bio: "Award-winning wedding photographers capturing candid moments with artistic vision. Specializing in cinematic storytelling and natural light photography.",
+    bio: "Award-winning wedding photographers capturing candid moments with artistic vision.",
     rating: 4.9,
     totalReviews: 234,
     totalBookings: 156,
@@ -285,7 +47,6 @@ export default function VendorDashboard({ user, setUser }) {
     priceRange: "₹85,000 - ₹2,50,000",
     verified: true,
     premium: true,
-    // Green Metrics
     greenScore: 65,
     ecoFriendly: true,
     zeroWaste: true,
@@ -293,62 +54,6 @@ export default function VendorDashboard({ user, setUser }) {
     recyclableMaterials: false,
     energyEfficient: false
   });
-
-  // Booking Requests
-  const [bookingRequests, setBookingRequests] = useState([
-    {
-      id: 1,
-      clientName: "Priya Sharma",
-      clientImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-      weddingDate: "2025-12-15",
-      venue: "Jaipur, Rajasthan",
-      guestCount: 250,
-      budget: "₹1,50,000 - ₹2,00,000",
-      requirements: "Looking for candid photography style with traditional touch.",
-      status: "pending",
-      requestedAt: "2024-01-18T10:30:00",
-      contact: "+91 98765 12345",
-      email: "priya@example.com"
-    },
-    {
-      id: 2,
-      clientName: "Anjali Verma",
-      clientImage: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80",
-      weddingDate: "2026-01-20",
-      venue: "Goa",
-      guestCount: 120,
-      budget: "₹1,00,000 - ₹1,50,000",
-      requirements: "Beach wedding photography, candid and natural shots preferred.",
-      status: "pending",
-      requestedAt: "2024-01-17T14:15:00",
-      contact: "+91 87654 32109",
-      email: "anjali@example.com"
-    }
-  ]);
-
-  // Upcoming Bookings
-  const [upcomingBookings, setUpcomingBookings] = useState([
-    {
-      id: 101,
-      clientName: "Meera & Karan",
-      weddingDate: "2025-02-15",
-      venue: "Goa",
-      package: "Premium Photography Package",
-      amount: "₹1,85,000",
-      status: "confirmed",
-      meetingScheduled: { date: "2024-01-25", time: "11:00 AM", link: "https://meet.vivaha.com/meera-karan" }
-    },
-    {
-      id: 102,
-      clientName: "Neha & Amit",
-      weddingDate: "2025-03-10",
-      venue: "Jaipur",
-      package: "Standard Photography Package",
-      amount: "₹1,20,000",
-      status: "confirmed",
-      meetingScheduled: { date: "2024-01-28", time: "2:00 PM", link: "https://meet.vivaha.com/neha-amit" }
-    }
-  ]);
 
   // Portfolio
   const [portfolio, setPortfolio] = useState([
@@ -361,7 +66,6 @@ export default function VendorDashboard({ user, setUser }) {
   const [powerPairs, setPowerPairs] = useState([
     { id: 1, name: "Royal Blooms Decor", category: "Decor", discount: "15%", status: "active" }
   ]);
-
   const [suggestedPowerPairs, setSuggestedPowerPairs] = useState([
     { id: 2, name: "Grand Feast Caterers", category: "Catering", discount: "10%", match: "92%" },
     { id: 3, name: "Beat Masters DJ", category: "Music", discount: "12%", match: "85%" }
@@ -382,9 +86,80 @@ export default function VendorDashboard({ user, setUser }) {
   const [aiInsights, setAiInsights] = useState([
     "Your response rate of 98% is excellent! Top 5% of vendors.",
     "Photos with natural lighting get 40% more inquiries.",
-    "Consider adding a video portfolio to increase conversions by 25%.",
-    "Your green score of 65 is good! Implementing sustainable practices can attract eco-conscious couples."
+    "Consider adding a video portfolio to increase conversions by 25%."
   ]);
+
+  // Load booking requests
+  useEffect(() => {
+    loadRequests();
+  }, []);
+
+  const loadRequests = async () => {
+    setLoading(true);
+    try {
+      // For demo, create some mock booking requests
+      const mockRequests = [
+        {
+          id: 101,
+          clientName: "Priya Sharma",
+          clientImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
+          weddingDate: "2025-12-15",
+          venue: "Jaipur, Rajasthan",
+          guestCount: 250,
+          budget: "₹1,50,000 - ₹2,00,000",
+          requirements: "Looking for candid photography style with traditional touch. Need coverage for 3 days including pre-wedding events.",
+          status: "pending",
+          requestedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+          contact: "+91 98765 12345",
+          email: "priya@example.com"
+        },
+        {
+          id: 102,
+          clientName: "Anjali Verma",
+          clientImage: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80",
+          weddingDate: "2026-01-20",
+          venue: "Goa",
+          guestCount: 120,
+          budget: "₹1,00,000 - ₹1,50,000",
+          requirements: "Beach wedding photography, candid and natural shots preferred. Need drone shots as well.",
+          status: "pending",
+          requestedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+          contact: "+91 87654 32109",
+          email: "anjali@example.com"
+        }
+      ];
+      
+      const mockUpcoming = [
+        {
+          id: 201,
+          clientName: "Meera & Karan",
+          weddingDate: "2025-02-15",
+          venue: "Goa",
+          package: "Premium Photography Package",
+          amount: "₹1,85,000",
+          status: "confirmed",
+          meetingScheduled: { date: "2024-01-25", time: "11:00 AM", link: "https://meet.vivaha.com/meera-karan" }
+        },
+        {
+          id: 202,
+          clientName: "Neha & Amit",
+          weddingDate: "2025-03-10",
+          venue: "Jaipur",
+          package: "Standard Photography Package",
+          amount: "₹1,20,000",
+          status: "confirmed",
+          meetingScheduled: { date: "2024-01-28", time: "2:00 PM", link: "https://meet.vivaha.com/neha-amit" }
+        }
+      ];
+      
+      setBookingRequests(mockRequests);
+      setUpcomingBookings(mockUpcoming);
+    } catch (error) {
+      console.error("Error loading requests:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAcceptRequest = (request) => {
     setSelectedRequest(request);
@@ -392,8 +167,10 @@ export default function VendorDashboard({ user, setUser }) {
   };
 
   const handleScheduleMeeting = (date, time) => {
-    const updated = bookingRequests.filter(r => r.id !== selectedRequest.id);
-    setBookingRequests(updated);
+    // Remove from pending requests
+    setBookingRequests(bookingRequests.filter(r => r.id !== selectedRequest.id));
+    
+    // Add to upcoming bookings
     setUpcomingBookings([...upcomingBookings, {
       id: Date.now(),
       clientName: selectedRequest.clientName,
@@ -404,12 +181,15 @@ export default function VendorDashboard({ user, setUser }) {
       status: "confirmed",
       meetingScheduled: { date, time, link: `https://meet.vivaha.com/${selectedRequest.clientName.toLowerCase().replace(' ', '-')}` }
     }]);
+    
     setShowMeetingModal(false);
     setSelectedRequest(null);
+    alert(`✅ Meeting scheduled with ${selectedRequest.clientName} on ${date} at ${time}`);
   };
 
   const handleRejectRequest = (requestId) => {
     setBookingRequests(bookingRequests.filter(r => r.id !== requestId));
+    alert("Request declined");
   };
 
   const addPowerPair = (pair) => {
@@ -433,6 +213,15 @@ export default function VendorDashboard({ user, setUser }) {
     { id: "profile", label: "Business Profile", icon: <Briefcase size={20} /> }
   ];
 
+  if (loading) {
+    return (
+      <div style={styles.loadingContainer}>
+        <div style={styles.spinner} />
+        <p>Loading dashboard...</p>
+      </div>
+    );
+  }
+
   return (
     <div style={styles.container}>
       {/* Header */}
@@ -443,10 +232,7 @@ export default function VendorDashboard({ user, setUser }) {
           </button>
           <HindiLogo size="small" />
           <div style={styles.headerRight}>
-            <button style={styles.notificationBtn} onClick={() => setShowNotification(!showNotification)}>
-              <Bell size={20} />
-              {bookingRequests.length > 0 && <span style={styles.notificationBadge}>{bookingRequests.length}</span>}
-            </button>
+            <GlobalNotifications user={user} />
             <button onClick={() => { setUser(null); navigate("/"); }} style={styles.logoutBtn}>
               <LogOut size={18} />
             </button>
@@ -454,36 +240,15 @@ export default function VendorDashboard({ user, setUser }) {
         </div>
       </div>
 
-      {/* Notification Dropdown */}
-      {showNotification && bookingRequests.length > 0 && (
-        <div style={styles.notificationDropdown}>
-          <p style={styles.notificationTitle}>New Booking Requests</p>
-          {bookingRequests.map(req => (
-            <div key={req.id} style={styles.notificationItem}>
-              <img src={req.clientImage} alt={req.clientName} style={styles.notificationAvatar} />
-              <div>
-                <p style={styles.notificationName}>{req.clientName}</p>
-                <p style={styles.notificationText}>Requested photography services</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
       {/* Sidebar Navigation */}
       {sidebarOpen && (
         <>
           <div style={styles.sidebarOverlay} onClick={() => setSidebarOpen(false)} />
           <div style={styles.sidebar}>
             <div style={styles.sidebarHeader}>
-              <div style={styles.sidebarLogo}>
-                <HindiLogo size="small" />
-              </div>
-              <button onClick={() => setSidebarOpen(false)} style={styles.closeSidebarBtn}>
-                <X size={22} />
-              </button>
+              <div style={styles.sidebarLogo}><HindiLogo size="small" /></div>
+              <button onClick={() => setSidebarOpen(false)} style={styles.closeSidebarBtn}><X size={22} /></button>
             </div>
-            
             <div style={styles.vendorInfoSidebar}>
               <div style={styles.vendorAvatarSidebar}>📸</div>
               <div>
@@ -491,7 +256,6 @@ export default function VendorDashboard({ user, setUser }) {
                 <p style={styles.vendorCategorySidebar}>{vendorProfile.category}</p>
               </div>
             </div>
-
             <div style={styles.sidebarNav}>
               {navItems.map(item => (
                 <button
@@ -506,7 +270,6 @@ export default function VendorDashboard({ user, setUser }) {
                 </button>
               ))}
             </div>
-
             <div style={styles.sidebarFooter}>
               <button style={styles.sidebarLogout} onClick={() => { setUser(null); navigate("/"); }}>
                 <LogOut size={18} /> Sign Out
@@ -551,207 +314,188 @@ export default function VendorDashboard({ user, setUser }) {
           </div>
         </div>
 
-        {/* Tab Content */}
-        <div style={styles.tabContent}>
-          {/* Overview Tab */}
-          {activeTab === "overview" && (
-            <div>
-              {/* Green Score Card */}
-              <GreenScoreCard vendorProfile={vendorProfile} setVendorProfile={setVendorProfile} />
-
-              {/* AI Performance Insights */}
-              <div style={styles.aiSection}>
-                <div style={styles.aiHeader}><Sparkles size={20} color="#E77291" /> AI Performance Insights</div>
-                <div style={styles.aiGrid}>
-                  {aiInsights.map((insight, i) => (
-                    <div key={i} style={styles.aiCard}><Zap size={16} color="#E77291" /><p>{insight}</p></div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Quick Actions */}
-              <div style={styles.quickActions}>
-                <h3 style={styles.sectionTitle}>Quick Actions</h3>
-                <div style={styles.actionGrid}>
-                  <button style={styles.actionCard} onClick={() => setActiveTab("requests")}><MessageCircle size={20} /> View Requests ({bookingRequests.length})</button>
-                  <button style={styles.actionCard} onClick={() => setShowPortfolioModal(true)}><Camera size={20} /> Update Portfolio</button>
-                  <button style={styles.actionCard} onClick={() => setShowPowerPairModal(true)}><Users size={20} /> Find Power Pairs</button>
-                  <button style={styles.actionCard} onClick={() => setActiveTab("analytics")}><BarChart3 size={20} /> View Analytics</button>
-                </div>
-              </div>
-
-              {/* Recent Activity */}
-              <div style={styles.recentSection}>
-                <h3 style={styles.sectionTitle}>Recent Activity</h3>
-                {bookingRequests.slice(0, 2).map(req => (
-                  <div key={req.id} style={styles.activityItem}>
-                    <div style={styles.activityIcon}>📩</div>
-                    <div><p><strong>{req.clientName}</strong> sent a booking request</p><p style={styles.activityTime}>{new Date(req.requestedAt).toLocaleDateString()}</p></div>
-                    <button style={styles.activityBtn} onClick={() => handleAcceptRequest(req)}>Review →</button>
-                  </div>
+        {/* Overview Tab */}
+        {activeTab === "overview" && (
+          <div>
+            <div style={styles.aiSection}>
+              <div style={styles.aiHeader}><Sparkles size={20} color="#E77291" /> AI Performance Insights</div>
+              <div style={styles.aiGrid}>
+                {aiInsights.map((insight, i) => (
+                  <div key={i} style={styles.aiCard}><Zap size={16} color="#E77291" /><p>{insight}</p></div>
                 ))}
               </div>
             </div>
-          )}
 
-          {/* Booking Requests Tab */}
-          {activeTab === "requests" && (
-            <div>
-              {bookingRequests.length === 0 ? (
-                <div style={styles.emptyState}>No pending requests</div>
-              ) : (
-                bookingRequests.map(request => (
-                  <div key={request.id} style={styles.requestCard}>
-                    <div style={styles.requestHeader}>
-                      <div style={styles.clientInfo}>
-                        <img src={request.clientImage} alt={request.clientName} style={styles.clientAvatar} />
-                        <div><h3>{request.clientName}</h3><p>Requested on {new Date(request.requestedAt).toLocaleDateString()}</p></div>
-                      </div>
-                      <div style={{...styles.requestStatus, background: "#FF980015", color: "#FF9800"}}><Clock size={12} /> Pending</div>
-                    </div>
-                    <div style={styles.requestDetails}>
-                      <div><Calendar size={14} /> Wedding: {request.weddingDate}</div>
-                      <div><MapPin size={14} /> {request.venue}</div>
-                      <div><Users size={14} /> {request.guestCount} guests</div>
-                      <div><DollarSign size={14} /> {request.budget}</div>
-                    </div>
-                    <div style={styles.requestRequirements}><strong>Requirements:</strong> {request.requirements}</div>
-                    <div style={styles.contactInfo}><Phone size={12} /> {request.contact} <Mail size={12} /> {request.email}</div>
-                    <div style={styles.requestActions}>
-                      <button style={styles.rejectBtn} onClick={() => handleRejectRequest(request.id)}><XCircle size={16} /> Decline</button>
-                      <button style={styles.acceptBtn} onClick={() => handleAcceptRequest(request)}><CheckCircle size={16} /> Accept & Schedule</button>
-                    </div>
-                  </div>
-                ))
-              )}
+            <div style={styles.quickActions}>
+              <h3 style={styles.sectionTitle}>Quick Actions</h3>
+              <div style={styles.actionGrid}>
+                <button style={styles.actionCard} onClick={() => setActiveTab("requests")}><MessageCircle size={20} /> View Requests ({bookingRequests.length})</button>
+                <button style={styles.actionCard} onClick={() => setShowPortfolioModal(true)}><Camera size={20} /> Update Portfolio</button>
+                <button style={styles.actionCard} onClick={() => setShowPowerPairModal(true)}><Users size={20} /> Find Power Pairs</button>
+                <button style={styles.actionCard} onClick={() => setActiveTab("analytics")}><BarChart3 size={20} /> View Analytics</button>
+              </div>
             </div>
-          )}
 
-          {/* Bookings Tab */}
-          {activeTab === "bookings" && (
-            <div>
-              {upcomingBookings.map(booking => (
-                <div key={booking.id} style={styles.bookingCard}>
-                  <div style={styles.bookingHeader}>
-                    <div><h3>{booking.clientName}</h3><p>{booking.weddingDate} • {booking.venue}</p></div>
-                    <div style={styles.bookingStatus}>✅ Confirmed</div>
-                  </div>
-                  <div style={styles.bookingDetails}>
-                    <div><Package size={14} /> {booking.package}</div>
-                    <div><DollarSign size={14} /> {booking.amount}</div>
-                    {booking.meetingScheduled && <div><Video size={14} /> Meeting: {booking.meetingScheduled.date} at {booking.meetingScheduled.time}</div>}
-                  </div>
-                  <div style={styles.bookingActions}>
-                    <button style={styles.messageBtn}><MessageCircle size={14} /> Message</button>
-                    <button style={styles.joinBtn} onClick={() => window.open(booking.meetingScheduled?.link, "_blank")}><Video size={14} /> Join Meeting</button>
-                  </div>
+            <div style={styles.recentSection}>
+              <h3 style={styles.sectionTitle}>Recent Activity</h3>
+              {bookingRequests.slice(0, 2).map(req => (
+                <div key={req.id} style={styles.activityItem}>
+                  <div style={styles.activityIcon}>📩</div>
+                  <div><p><strong>{req.clientName}</strong> sent a booking request</p><p style={styles.activityTime}>{new Date(req.requestedAt).toLocaleDateString()}</p></div>
+                  <button style={styles.activityBtn} onClick={() => handleAcceptRequest(req)}>Review →</button>
                 </div>
               ))}
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Analytics Tab */}
-          {activeTab === "analytics" && (
-            <div>
-              <div style={styles.analyticsCard}>
-                <h3>Growth Overview</h3>
-                <div style={styles.growthBadge}><TrendingUp size={14} /> +{analytics.growthRate}% from last month</div>
-                <div style={styles.monthlyChart}>
-                  {analytics.monthlyStats.map((stat, i) => <div key={i} style={{...styles.chartBar, height: `${stat * 2}px`}}><span>{stat}</span></div>)}
+        {/* Booking Requests Tab */}
+        {activeTab === "requests" && (
+          <div>
+            {bookingRequests.length === 0 ? (
+              <div style={styles.emptyState}>No pending requests</div>
+            ) : (
+              bookingRequests.map(request => (
+                <div key={request.id} style={styles.requestCard}>
+                  <div style={styles.requestHeader}>
+                    <div style={styles.clientInfo}>
+                      <img src={request.clientImage} alt={request.clientName} style={styles.clientAvatar} />
+                      <div><h3>{request.clientName}</h3><p>Requested on {new Date(request.requestedAt).toLocaleDateString()}</p></div>
+                    </div>
+                    <div style={{...styles.requestStatus, background: "#FF980015", color: "#FF9800"}}><Clock size={12} /> Pending</div>
+                  </div>
+                  <div style={styles.requestDetails}>
+                    <div><Calendar size={14} /> Wedding: {request.weddingDate}</div>
+                    <div><MapPin size={14} /> {request.venue}</div>
+                    <div><Users size={14} /> {request.guestCount} guests</div>
+                    <div><DollarSign size={14} /> {request.budget}</div>
+                  </div>
+                  <div style={styles.requestRequirements}><strong>Requirements:</strong> {request.requirements}</div>
+                  <div style={styles.contactInfo}><Phone size={12} /> {request.contact} <Mail size={12} /> {request.email}</div>
+                  <div style={styles.requestActions}>
+                    <button style={styles.rejectBtn} onClick={() => handleRejectRequest(request.id)}><XCircle size={16} /> Decline</button>
+                    <button style={styles.acceptBtn} onClick={() => handleAcceptRequest(request)}><CheckCircle size={16} /> Accept & Schedule</button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
+        {/* Bookings Tab */}
+        {activeTab === "bookings" && (
+          <div>
+            {upcomingBookings.map(booking => (
+              <div key={booking.id} style={styles.bookingCard}>
+                <div style={styles.bookingHeader}>
+                  <div><h3>{booking.clientName}</h3><p>{booking.weddingDate} • {booking.venue}</p></div>
+                  <div style={styles.bookingStatus}>✅ Confirmed</div>
+                </div>
+                <div style={styles.bookingDetails}>
+                  <div><Package size={14} /> {booking.package}</div>
+                  <div><DollarSign size={14} /> {booking.amount}</div>
+                  {booking.meetingScheduled && <div><Video size={14} /> Meeting: {booking.meetingScheduled.date} at {booking.meetingScheduled.time}</div>}
+                </div>
+                <div style={styles.bookingActions}>
+                  <button style={styles.messageBtn}><MessageCircle size={14} /> Message</button>
+                  <button style={styles.joinBtn} onClick={() => window.open(booking.meetingScheduled?.link, "_blank")}><Video size={14} /> Join Meeting</button>
                 </div>
               </div>
-              <div style={styles.analyticsGrid}>
-                <div style={styles.analyticsItem}><Target size={20} color="#AC1634" /><div><p>Conversion Rate</p><p style={styles.analyticsValue}>{analytics.conversionRate}%</p></div></div>
-                <div style={styles.analyticsItem}><Award size={20} color="#AC1634" /><div><p>Response Rate</p><p style={styles.analyticsValue}>{vendorProfile.responseRate}</p></div></div>
-                <div style={styles.analyticsItem}><Clock size={20} color="#AC1634" /><div><p>Avg Response</p><p style={styles.analyticsValue}>{vendorProfile.responseTime}</p></div></div>
-                <div style={styles.analyticsItem}><Star size={20} color="#AC1634" /><div><p>Rating</p><p style={styles.analyticsValue}>{vendorProfile.rating}/5</p></div></div>
-              </div>
-              <div style={styles.aiRecommendation}>
-                <Sparkles size={20} color="#E77291" />
-                <div><strong>AI Recommendation:</strong> Adding more candid shot samples to your portfolio could increase inquiries by 35%.</div>
+            ))}
+          </div>
+        )}
+
+        {/* Analytics Tab */}
+        {activeTab === "analytics" && (
+          <div>
+            <div style={styles.analyticsCard}>
+              <h3>Growth Overview</h3>
+              <div style={styles.growthBadge}><TrendingUp size={14} /> +{analytics.growthRate}% from last month</div>
+              <div style={styles.monthlyChart}>
+                {analytics.monthlyStats.map((stat, i) => <div key={i} style={{...styles.chartBar, height: `${stat * 2}px`}}><span>{stat}</span></div>)}
               </div>
             </div>
-          )}
-
-          {/* Portfolio Tab */}
-          {activeTab === "portfolio" && (
-            <div>
-              <div style={styles.portfolioHeader}>
-                <h3>Your Work Gallery</h3>
-                <button style={styles.addPhotoBtn} onClick={() => setShowPortfolioModal(true)}><Plus size={16} /> Add Photo</button>
-              </div>
-              <div style={styles.portfolioGrid}>
-                {portfolio.map((img, i) => (
-                  <div key={i} style={styles.portfolioItem}>
-                    <img src={img} alt={`Portfolio ${i+1}`} style={styles.portfolioImage} />
-                  </div>
-                ))}
-                <div style={styles.portfolioAdd} onClick={() => setShowPortfolioModal(true)}><Camera size={32} /><p>Add New</p></div>
-              </div>
-              <div style={styles.portfolioTip}>
-                <Sparkles size={16} color="#E77291" /> <strong>Pro Tip:</strong> Portfolios with 15+ images get 2x more inquiries!
-              </div>
+            <div style={styles.analyticsGrid}>
+              <div style={styles.analyticsItem}><Target size={20} color="#AC1634" /><div><p>Conversion Rate</p><p style={styles.analyticsValue}>{analytics.conversionRate}%</p></div></div>
+              <div style={styles.analyticsItem}><Award size={20} color="#AC1634" /><div><p>Response Rate</p><p style={styles.analyticsValue}>{vendorProfile.responseRate}</p></div></div>
+              <div style={styles.analyticsItem}><Clock size={20} color="#AC1634" /><div><p>Avg Response</p><p style={styles.analyticsValue}>{vendorProfile.responseTime}</p></div></div>
+              <div style={styles.analyticsItem}><Star size={20} color="#AC1634" /><div><p>Rating</p><p style={styles.analyticsValue}>{vendorProfile.rating}/5</p></div></div>
             </div>
-          )}
+            <div style={styles.aiRecommendation}>
+              <Sparkles size={20} color="#E77291" />
+              <div><strong>AI Recommendation:</strong> Adding more candid shot samples to your portfolio could increase inquiries by 35%.</div>
+            </div>
+          </div>
+        )}
 
-          {/* Power Pairs Tab */}
-          {activeTab === "powerpairs" && (
-            <div>
-              <div style={styles.powerPairHeader}>
-                <h3>Your Power Pairs</h3>
-                <button style={styles.findPairBtn} onClick={() => setShowPowerPairModal(true)}><Plus size={16} /> Find Partners</button>
-              </div>
-              {powerPairs.map(pair => (
-                <div key={pair.id} style={styles.powerPairItem}>
-                  <div><strong>{pair.name}</strong><p>{pair.category}</p></div>
-                  <div style={styles.pairDiscount}>{pair.discount} off for couples</div>
-                  <span style={styles.activeBadge}>Active</span>
+        {/* Portfolio Tab */}
+        {activeTab === "portfolio" && (
+          <div>
+            <div style={styles.portfolioHeader}>
+              <h3>Your Work Gallery</h3>
+              <button style={styles.addPhotoBtn} onClick={() => setShowPortfolioModal(true)}><Plus size={16} /> Add Photo</button>
+            </div>
+            <div style={styles.portfolioGrid}>
+              {portfolio.map((img, i) => (
+                <div key={i} style={styles.portfolioItem}>
+                  <img src={img} alt={`Portfolio ${i+1}`} style={styles.portfolioImage} />
                 </div>
               ))}
-              <div style={styles.suggestedSection}>
-                <h4>Suggested Partners 🤝</h4>
-                {suggestedPowerPairs.map(pair => (
-                  <div key={pair.id} style={styles.suggestedItem}>
-                    <div><strong>{pair.name}</strong><p>{pair.category} • {pair.match} match</p></div>
-                    <button style={styles.connectBtn} onClick={() => addPowerPair(pair)}>Connect →</button>
-                  </div>
-                ))}
-              </div>
+              <div style={styles.portfolioAdd} onClick={() => setShowPortfolioModal(true)}><Camera size={32} /><p>Add New</p></div>
             </div>
-          )}
+            <div style={styles.portfolioTip}>
+              <Sparkles size={16} color="#E77291" /> <strong>Pro Tip:</strong> Portfolios with 15+ images get 2x more inquiries!
+            </div>
+          </div>
+        )}
 
-          {/* Profile Tab */}
-          {activeTab === "profile" && (
-            <div>
-              <div style={styles.profileCard}>
-                <div style={styles.profileHeaderSection}>
-                  <div style={styles.profileAvatar}>📸</div>
-                  <div>
-                    {editingProfile ? <input style={styles.editInput} value={vendorProfile.businessName} onChange={(e) => setVendorProfile({...vendorProfile, businessName: e.target.value})} /> : <h2>{vendorProfile.businessName}</h2>}
-                    <p style={styles.profileCategory}>{vendorProfile.category} • {vendorProfile.experience} experience</p>
-                  </div>
-                  <button style={styles.editProfileBtn} onClick={() => setEditingProfile(!editingProfile)}>{editingProfile ? <Save size={16} /> : <Edit2 size={16} />} {editingProfile ? "Save" : "Edit"}</button>
-                </div>
-                <div style={styles.profileDetails}>
-                  <div><MapPin size={16} /> {vendorProfile.location}</div>
-                  <div><Phone size={16} /> {vendorProfile.phone}</div>
-                  <div><Mail size={16} /> {vendorProfile.email}</div>
-                </div>
-                {editingProfile ? <textarea style={styles.editTextarea} value={vendorProfile.bio} onChange={(e) => setVendorProfile({...vendorProfile, bio: e.target.value})} rows={3} /> : <p style={styles.profileBio}>{vendorProfile.bio}</p>}
-                <div style={styles.greenMetrics}>
-                  <h4>🌿 Sustainability Practices</h4>
-                  <div style={styles.metricsGrid}>
-                    <label><input type="checkbox" checked={vendorProfile.ecoFriendly} onChange={(e) => setVendorProfile({...vendorProfile, ecoFriendly: e.target.checked})} /> Eco-Friendly Products</label>
-                    <label><input type="checkbox" checked={vendorProfile.zeroWaste} onChange={(e) => setVendorProfile({...vendorProfile, zeroWaste: e.target.checked})} /> Zero Waste Policy</label>
-                    <label><input type="checkbox" checked={vendorProfile.localSourcing} onChange={(e) => setVendorProfile({...vendorProfile, localSourcing: e.target.checked})} /> Local Sourcing</label>
-                    <label><input type="checkbox" checked={vendorProfile.recyclableMaterials} onChange={(e) => setVendorProfile({...vendorProfile, recyclableMaterials: e.target.checked})} /> Recyclable Materials</label>
-                    <label><input type="checkbox" checked={vendorProfile.energyEfficient} onChange={(e) => setVendorProfile({...vendorProfile, energyEfficient: e.target.checked})} /> Energy Efficient</label>
-                  </div>
-                </div>
-              </div>
+        {/* Power Pairs Tab */}
+        {activeTab === "powerpairs" && (
+          <div>
+            <div style={styles.powerPairHeader}>
+              <h3>Your Power Pairs</h3>
+              <button style={styles.findPairBtn} onClick={() => setShowPowerPairModal(true)}><Plus size={16} /> Find Partners</button>
             </div>
-          )}
-        </div>
+            {powerPairs.map(pair => (
+              <div key={pair.id} style={styles.powerPairItem}>
+                <div><strong>{pair.name}</strong><p>{pair.category}</p></div>
+                <div style={styles.pairDiscount}>{pair.discount} off for couples</div>
+                <span style={styles.activeBadge}>Active</span>
+              </div>
+            ))}
+            <div style={styles.suggestedSection}>
+              <h4>Suggested Partners 🤝</h4>
+              {suggestedPowerPairs.map(pair => (
+                <div key={pair.id} style={styles.suggestedItem}>
+                  <div><strong>{pair.name}</strong><p>{pair.category} • {pair.match} match</p></div>
+                  <button style={styles.connectBtn} onClick={() => addPowerPair(pair)}>Connect →</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Profile Tab */}
+        {activeTab === "profile" && (
+          <div>
+            <div style={styles.profileCard}>
+              <div style={styles.profileHeaderSection}>
+                <div style={styles.profileAvatar}>📸</div>
+                <div>
+                  {editingProfile ? <input style={styles.editInput} value={vendorProfile.businessName} onChange={(e) => setVendorProfile({...vendorProfile, businessName: e.target.value})} /> : <h2>{vendorProfile.businessName}</h2>}
+                  <p style={styles.profileCategory}>{vendorProfile.category} • {vendorProfile.experience} experience</p>
+                </div>
+                <button style={styles.editProfileBtn} onClick={() => setEditingProfile(!editingProfile)}>{editingProfile ? <Save size={16} /> : <Edit2 size={16} />} {editingProfile ? "Save" : "Edit"}</button>
+              </div>
+              <div style={styles.profileDetails}>
+                <div><MapPin size={16} /> {vendorProfile.location}</div>
+                <div><Phone size={16} /> {vendorProfile.phone}</div>
+                <div><Mail size={16} /> {vendorProfile.email}</div>
+              </div>
+              {editingProfile ? <textarea style={styles.editTextarea} value={vendorProfile.bio} onChange={(e) => setVendorProfile({...vendorProfile, bio: e.target.value})} rows={3} /> : <p style={styles.profileBio}>{vendorProfile.bio}</p>}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Meeting Modal */}
@@ -819,19 +563,13 @@ export default function VendorDashboard({ user, setUser }) {
 
 const styles = {
   container: { minHeight: "100vh", background: "#FDF0F3", fontFamily: "'DM Sans', sans-serif" },
+  loadingContainer: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100vh", gap: "16px" },
+  spinner: { width: "40px", height: "40px", border: "3px solid #F5D0DA", borderTopColor: "#AC1634", borderRadius: "50%", animation: "spin 1s linear infinite" },
   header: { background: "#3E0014", position: "sticky", top: 0, zIndex: 100 },
   headerContent: { maxWidth: "1280px", margin: "0 auto", padding: "16px 32px", display: "flex", justifyContent: "space-between", alignItems: "center" },
   menuBtn: { background: "rgba(231,114,145,0.15)", border: "1px solid rgba(231,114,145,0.3)", color: "#E77291", cursor: "pointer", padding: "10px", borderRadius: "12px" },
   headerRight: { display: "flex", gap: "12px" },
-  notificationBtn: { background: "rgba(231,114,145,0.15)", border: "1px solid rgba(231,114,145,0.3)", color: "#E77291", cursor: "pointer", padding: "10px", borderRadius: "12px", position: "relative" },
-  notificationBadge: { position: "absolute", top: "-5px", right: "-5px", background: "#AC1634", color: "white", borderRadius: "50%", width: "18px", height: "18px", fontSize: "10px", display: "flex", alignItems: "center", justifyContent: "center" },
   logoutBtn: { background: "rgba(231,114,145,0.15)", border: "1px solid rgba(231,114,145,0.3)", color: "#E77291", cursor: "pointer", padding: "10px", borderRadius: "12px" },
-  notificationDropdown: { position: "absolute", top: "70px", right: "32px", background: "white", borderRadius: "16px", width: "300px", boxShadow: "0 8px 24px rgba(0,0,0,0.15)", zIndex: 200, padding: "16px" },
-  notificationTitle: { fontWeight: 600, marginBottom: "12px", paddingBottom: "8px", borderBottom: "1px solid #F5D0DA" },
-  notificationItem: { display: "flex", gap: "12px", padding: "10px 0", borderBottom: "1px solid #F5D0DA" },
-  notificationAvatar: { width: "40px", height: "40px", borderRadius: "50%", objectFit: "cover" },
-  notificationName: { fontWeight: 500, fontSize: "13px" },
-  notificationText: { fontSize: "11px", color: "#666" },
   sidebarOverlay: { position: "fixed", inset: 0, background: "rgba(62,0,20,0.6)", zIndex: 998 },
   sidebar: { position: "fixed", top: 0, left: 0, bottom: 0, width: 320, background: "white", zIndex: 999, padding: "24px", display: "flex", flexDirection: "column", boxShadow: "2px 0 12px rgba(0,0,0,0.1)" },
   sidebarHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px", paddingBottom: "16px", borderBottom: "1px solid #F5D0DA" },
@@ -860,13 +598,12 @@ const styles = {
   statIcon: { width: "48px", height: "48px", borderRadius: "50%", background: "#FDF0F3", display: "flex", alignItems: "center", justifyContent: "center" },
   statValue: { fontSize: "28px", fontWeight: "bold", color: "#3E0014" },
   statLabel: { fontSize: "12px", color: "#666" },
-  tabContent: { marginTop: "16px" },
   aiSection: { background: "linear-gradient(135deg, #FFF5F7, white)", borderRadius: "20px", padding: "24px", marginBottom: "32px", border: "1px solid #F5D0DA" },
   aiHeader: { display: "flex", alignItems: "center", gap: "8px", fontSize: "18px", fontWeight: 600, marginBottom: "16px" },
   aiGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "16px" },
   aiCard: { display: "flex", alignItems: "center", gap: "12px", padding: "16px", background: "white", borderRadius: "12px", border: "1px solid #F5D0DA" },
-  quickActions: { marginBottom: "32px" },
   sectionTitle: { fontSize: "18px", fontWeight: 600, marginBottom: "16px", color: "#3E0014" },
+  quickActions: { marginBottom: "32px" },
   actionGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "16px" },
   actionCard: { background: "white", border: "1px solid #F5D0DA", borderRadius: "16px", padding: "20px", cursor: "pointer", display: "flex", alignItems: "center", gap: "12px", fontWeight: 500 },
   recentSection: { marginBottom: "32px" },
@@ -924,12 +661,11 @@ const styles = {
   profileBio: { fontSize: "14px", color: "#666", lineHeight: 1.6, marginBottom: "16px" },
   editInput: { padding: "8px", borderRadius: "8px", border: "1px solid #F5D0DA", fontSize: "14px", width: "100%", maxWidth: "300px" },
   editTextarea: { padding: "12px", borderRadius: "12px", border: "1px solid #F5D0DA", width: "100%", fontSize: "14px", marginBottom: "16px" },
-  greenMetrics: { marginTop: "20px", paddingTop: "16px", borderTop: "1px solid #F5D0DA" },
-  metricsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "12px", marginTop: "12px" },
   emptyState: { textAlign: "center", padding: "60px", color: "#999" },
   modalOverlay: { position: "fixed", inset: 0, background: "rgba(62,0,20,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 },
   modal: { background: "white", borderRadius: "24px", width: "90%", maxWidth: "500px", maxHeight: "80vh", overflow: "auto" },
   modalHeader: { padding: "20px", borderBottom: "1px solid #F5D0DA", display: "flex", justifyContent: "space-between", alignItems: "center" },
+  modalClose: { background: "none", border: "none", fontSize: "20px", cursor: "pointer" },
   modalContent: { padding: "24px" },
   modalInput: { width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid #F5D0DA", marginBottom: "16px" },
   modalActions: { display: "flex", gap: "12px", marginTop: "16px" },

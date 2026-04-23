@@ -1,4 +1,8 @@
 // src/pages/AIAssistantPage.jsx
+console.log("=== DEBUGGING API KEY ===");
+console.log("API Key from env:", import.meta.env.VITE_GEMINI_API_KEY);
+console.log("API Key exists:", !!import.meta.env.VITE_GEMINI_API_KEY);
+console.log("All VITE env vars:", Object.keys(import.meta.env).filter(key => key.startsWith('VITE')));
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Sparkles } from "lucide-react";

@@ -1,5 +1,7 @@
+// src/App.jsx
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Toaster } from 'react-hot-toast';
 
 // Import all pages
 import SplashScreen from "./pages/SplashScreen";
@@ -26,6 +28,7 @@ import AdminLogin from "./pages/AdminLogin";
 import RasamRiwaz from "./pages/RasamRiwaz";
 import LegalDocs from "./pages/LegalDocs";
 import AIAssistantPage from "./pages/AIAssistantPage";
+import ScheduleMeeting from "./pages/ScheduleMeeting";
 
 function App() {
   const [user, setUser] = useState({ 
@@ -33,16 +36,44 @@ function App() {
     role: "couple", 
     premium: false 
   });
-  
   const [admin, setAdmin] = useState(null);
+  const [showScroll, setShowScroll] = useState(false);
+
+  // Back to Top Button Logic
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScroll(window.scrollY > 300);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    
+    // Cleanup
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // Debug log to check if App is rendering
   console.log("App rendering, user:", user);
 
   return (
     <BrowserRouter>
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#3E0014',
+            color: '#fff',
+            fontFamily: "'DM Sans', sans-serif",
+            borderRadius: '12px',
+          },
+        }}
+      />
+      
       <Routes>
-        // In App.jsx, make sure routes are in this order:
         <Route path="/" element={<SplashScreen />} />
         <Route path="/real-weddings" element={<RealWeddings />} />
         <Route path="/login" element={<Login setUser={setUser} />} />
@@ -53,7 +84,7 @@ function App() {
         <Route path="/vendor/dashboard" element={<VendorDashboard user={user} setUser={setUser} />} />
         <Route path="/checklist" element={<Checklist user={user} />} />
         <Route path="/inspiration" element={<InspirationBoard user={user} />} />
-        <Route path="/package" element={<BuildPackage />} />
+        <Route path="/package" element={<BuildPackage user={user} setUser={setUser} />} />
         <Route path="/profile" element={<CoupleProfile setUser={setUser} user={user} />} />
         <Route path="/messages" element={<Messaging />} />
         <Route path="/admin-login" element={<AdminLogin setAdmin={setAdmin} />} />
@@ -66,7 +97,45 @@ function App() {
         <Route path="/rasam-riwaz" element={<RasamRiwaz />} />
         <Route path="/legal-docs" element={<LegalDocs />} />
         <Route path="/ai-assistant" element={<AIAssistantPage user={user} />} />
+        <Route path="/schedule-meeting/:bookingId" element={<ScheduleMeeting />} />
       </Routes>
+      
+      {/* Back to Top Button */}
+      {showScroll && (
+        <button
+          onClick={scrollToTop}
+          style={{
+            position: "fixed",
+            bottom: "80px",
+            right: "20px",
+            width: "48px",
+            height: "48px",
+            borderRadius: "50%",
+            background: "#AC1634",
+            color: "white",
+            border: "none",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "24px",
+            fontWeight: "bold",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+            transition: "all 0.3s ease",
+            zIndex: 1000,
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = "scale(1.1)";
+            e.currentTarget.style.background = "#E77291";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "scale(1)";
+            e.currentTarget.style.background = "#AC1634";
+          }}
+        >
+          ↑
+        </button>
+      )}
     </BrowserRouter>
   );
 }
